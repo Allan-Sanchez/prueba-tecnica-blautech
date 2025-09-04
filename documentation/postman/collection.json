@@ -1,0 +1,796 @@
+{
+  "info": {
+    "name": "Prueba Técnica API - Shop App",
+    "description": "API REST para aplicación de tienda con autenticación JWT, gestión de usuarios, productos y carrito de compras.",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080/api",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "description": "Endpoints para autenticación y manejo de sesiones JWT",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.success && response.data) {",
+                  "        pm.collectionVariables.set('access_token', response.data.accessToken);",
+                  "        pm.collectionVariables.set('refresh_token', response.data.refreshToken);",
+                  "        pm.collectionVariables.set('user_id', response.data.user.id);",
+                  "        console.log('Tokens saved successfully');",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"usuario@ejemplo.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Iniciar sesión con email y contraseña. Retorna access_token y refresh_token."
+          },
+          "response": [
+            {
+              "name": "Login Exitoso",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"usuario@ejemplo.com\",\n  \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["auth", "login"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"httpStatus\": 200,\n  \"appCode\": \"LOGIN_OK\",\n  \"message\": \"Inicio de sesión exitoso\",\n  \"data\": {\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"tokenType\": \"Bearer\",\n    \"expiresIn\": 900000,\n    \"user\": {\n      \"id\": 1,\n      \"firstName\": \"Juan\",\n      \"lastName\": \"Pérez\",\n      \"email\": \"usuario@ejemplo.com\",\n      \"shippingAddress\": \"123 Calle Principal\",\n      \"birthDate\": \"1990-01-01\",\n      \"createdAt\": \"2024-01-01T10:00:00\",\n      \"updatedAt\": \"2024-01-01T10:00:00\"\n    }\n  },\n  \"errors\": [],\n  \"meta\": {\n    \"requestId\": \"uuid-123\",\n    \"timestamp\": \"2024-01-01T10:00:00Z\",\n    \"service\": \"prueba-tecnica-api\",\n    \"version\": \"1.0.0\"\n  }\n}"
+            },
+            {
+              "name": "Credenciales Inválidas",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"usuario@ejemplo.com\",\n  \"password\": \"wrongpassword\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["auth", "login"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"httpStatus\": 401,\n  \"appCode\": \"AUTH_INVALID_CREDENTIALS\",\n  \"message\": \"Credenciales inválidas\",\n  \"data\": null,\n  \"errors\": [],\n  \"meta\": {\n    \"requestId\": \"uuid-123\",\n    \"timestamp\": \"2024-01-01T10:00:00Z\",\n    \"service\": \"prueba-tecnica-api\",\n    \"version\": \"1.0.0\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.success && response.data) {",
+                  "        pm.collectionVariables.set('access_token', response.data.accessToken);",
+                  "        pm.collectionVariables.set('refresh_token', response.data.refreshToken);",
+                  "        console.log('Tokens refreshed successfully');",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "refresh"]
+            },
+            "description": "Renovar access_token usando refresh_token. Implementa rotación de tokens."
+          },
+          "response": [
+            {
+              "name": "Token Renovado",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/refresh",
+                  "host": ["{{base_url}}"],
+                  "path": ["auth", "refresh"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"httpStatus\": 200,\n  \"appCode\": \"LOGIN_OK\",\n  \"message\": \"Token renovado exitosamente\",\n  \"data\": {\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"tokenType\": \"Bearer\",\n    \"expiresIn\": 900000,\n    \"user\": {\n      \"id\": 1,\n      \"firstName\": \"Juan\",\n      \"lastName\": \"Pérez\",\n      \"email\": \"usuario@ejemplo.com\"\n    }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "description": "Gestión de usuarios - registro, perfil, actualización",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Juan\",\n  \"lastName\": \"Pérez\",\n  \"shippingAddress\": \"123 Calle Principal, Ciudad, País\",\n  \"email\": \"usuario@ejemplo.com\",\n  \"birthDate\": \"1990-01-15\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/register",
+              "host": ["{{base_url}}"],
+              "path": ["users", "register"]
+            },
+            "description": "Registrar un nuevo usuario en el sistema"
+          },
+          "response": [
+            {
+              "name": "Usuario Registrado",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Juan\",\n  \"lastName\": \"Pérez\",\n  \"shippingAddress\": \"123 Calle Principal\",\n  \"email\": \"usuario@ejemplo.com\",\n  \"birthDate\": \"1990-01-15\",\n  \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/users/register",
+                  "host": ["{{base_url}}"],
+                  "path": ["users", "register"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"httpStatus\": 201,\n  \"appCode\": \"USER_REGISTERED\",\n  \"message\": \"Usuario registrado exitosamente\",\n  \"data\": {\n    \"id\": 1,\n    \"firstName\": \"Juan\",\n    \"lastName\": \"Pérez\",\n    \"shippingAddress\": \"123 Calle Principal\",\n    \"email\": \"usuario@ejemplo.com\",\n    \"birthDate\": \"1990-01-15\",\n    \"createdAt\": \"2024-01-01T10:00:00\",\n    \"updatedAt\": \"2024-01-01T10:00:00\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Current User Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/me",
+              "host": ["{{base_url}}"],
+              "path": ["users", "me"]
+            },
+            "description": "Obtener el perfil del usuario autenticado"
+          },
+          "response": [
+            {
+              "name": "Perfil Obtenido",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/users/me",
+                  "host": ["{{base_url}}"],
+                  "path": ["users", "me"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"httpStatus\": 200,\n  \"appCode\": \"PROFILE_FETCHED\",\n  \"message\": \"Perfil de usuario obtenido exitosamente\",\n  \"data\": {\n    \"id\": 1,\n    \"firstName\": \"Juan\",\n    \"lastName\": \"Pérez\",\n    \"shippingAddress\": \"123 Calle Principal\",\n    \"email\": \"usuario@ejemplo.com\",\n    \"birthDate\": \"1990-01-15\",\n    \"createdAt\": \"2024-01-01T10:00:00\",\n    \"updatedAt\": \"2024-01-01T10:00:00\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Juan Carlos\",\n  \"lastName\": \"Pérez García\",\n  \"shippingAddress\": \"456 Nueva Dirección, Ciudad, País\",\n  \"birthDate\": \"1990-01-15\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/me",
+              "host": ["{{base_url}}"],
+              "path": ["users", "me"]
+            },
+            "description": "Actualizar el perfil del usuario autenticado"
+          },
+          "response": [
+            {
+              "name": "Perfil Actualizado",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Juan Carlos\",\n  \"shippingAddress\": \"456 Nueva Dirección\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/users/me",
+                  "host": ["{{base_url}}"],
+                  "path": ["users", "me"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"httpStatus\": 200,\n  \"appCode\": \"PROFILE_UPDATED\",\n  \"message\": \"Perfil de usuario actualizado exitosamente\",\n  \"data\": {\n    \"id\": 1,\n    \"firstName\": \"Juan Carlos\",\n    \"lastName\": \"Pérez García\",\n    \"shippingAddress\": \"456 Nueva Dirección\",\n    \"email\": \"usuario@ejemplo.com\",\n    \"birthDate\": \"1990-01-15\",\n    \"createdAt\": \"2024-01-01T10:00:00\",\n    \"updatedAt\": \"2024-01-01T10:30:00\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/logout",
+              "host": ["{{base_url}}"],
+              "path": ["users", "logout"]
+            },
+            "description": "Cerrar sesión y revocar todos los refresh tokens del usuario"
+          },
+          "response": [
+            {
+              "name": "Logout Exitoso",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/users/logout",
+                  "host": ["{{base_url}}"],
+                  "path": ["users", "logout"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"httpStatus\": 200,\n  \"appCode\": \"LOGOUT_SUCCESS\",\n  \"message\": \"Sesión cerrada exitosamente\",\n  \"data\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "description": "Gestión de productos - listar, crear, actualizar, eliminar",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products",
+              "host": ["{{base_url}}"],
+              "path": ["products"]
+            },
+            "description": "Obtener todos los productos activos con paginación"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Products (No Pagination)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/all",
+              "host": ["{{base_url}}"],
+              "path": ["products", "all"]
+            },
+            "description": "Obtener todos los productos activos sin paginación"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/1",
+              "host": ["{{base_url}}"],
+              "path": ["products", "1"]
+            },
+            "description": "Obtener un producto específico por su ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Products",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products?search=laptop&page=0&size=10",
+              "host": ["{{base_url}}"],
+              "path": ["products"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "laptop"
+                },
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Buscar productos por nombre o descripción"
+          },
+          "response": []
+        },
+        {
+          "name": "Filter Products by Price",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products?minPrice=100&maxPrice=500&page=0&size=10",
+              "host": ["{{base_url}}"],
+              "path": ["products"],
+              "query": [
+                {
+                  "key": "minPrice",
+                  "value": "100"
+                },
+                {
+                  "key": "maxPrice",
+                  "value": "500"
+                },
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Filtrar productos por rango de precio"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Laptop Gaming MSI\",\n  \"description\": \"Laptop para gaming con procesador Intel i7, 16GB RAM, SSD 512GB y tarjeta gráfica RTX 3060\",\n  \"imageUrl\": \"https://example.com/images/laptop-msi.jpg\",\n  \"price\": 1299.99,\n  \"currency\": \"GTQ\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/products",
+              "host": ["{{base_url}}"],
+              "path": ["products"]
+            },
+            "description": "Crear un nuevo producto"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Laptop Gaming MSI - Actualizado\",\n  \"description\": \"Laptop para gaming actualizada con procesador Intel i7, 32GB RAM, SSD 1TB y tarjeta gráfica RTX 4060\",\n  \"price\": 1499.99\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/products/1",
+              "host": ["{{base_url}}"],
+              "path": ["products", "1"]
+            },
+            "description": "Actualizar un producto existente"
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate Product",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/1",
+              "host": ["{{base_url}}"],
+              "path": ["products", "1"]
+            },
+            "description": "Desactivar un producto (soft delete)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Products Count",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/count",
+              "host": ["{{base_url}}"],
+              "path": ["products", "count"]
+            },
+            "description": "Obtener el total de productos activos"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Configuration",
+      "description": "Endpoints de configuración de la aplicación",
+      "item": [
+        {
+          "name": "Get App Info",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/configuration/info",
+              "host": ["{{base_url}}"],
+              "path": ["configuration", "info"]
+            },
+            "description": "Obtener información general de la aplicación"
+          },
+          "response": [
+            {
+              "name": "App Info",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/configuration/info",
+                  "host": ["{{base_url}}"],
+                  "path": ["configuration", "info"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"httpStatus\": 200,\n  \"appCode\": \"APP_INFO_OK\",\n  \"message\": \"Información de la aplicación obtenida exitosamente\",\n  \"data\": {\n    \"appName\": \"Shop App API\",\n    \"version\": \"1.0.0\",\n    \"description\": \"API REST para aplicación de tienda\",\n    \"environment\": \"development\"\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Carts",
+      "description": "Gestión del carrito de compras (endpoints futuros)",
+      "item": [
+        {
+          "name": "Get User Cart",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/carts/me",
+              "host": ["{{base_url}}"],
+              "path": ["carts", "me"]
+            },
+            "description": "Obtener el carrito activo del usuario autenticado"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Item to Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": 1,\n  \"quantity\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/carts/items",
+              "host": ["{{base_url}}"],
+              "path": ["carts", "items"]
+            },
+            "description": "Agregar un producto al carrito"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Cart Item",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 3\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/carts/items/1",
+              "host": ["{{base_url}}"],
+              "path": ["carts", "items", "1"]
+            },
+            "description": "Actualizar la cantidad de un item en el carrito"
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Item from Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/carts/items/1",
+              "host": ["{{base_url}}"],
+              "path": ["carts", "items", "1"]
+            },
+            "description": "Eliminar un item del carrito"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "description": "Gestión de órdenes y checkout (endpoints futuros)",
+      "item": [
+        {
+          "name": "Checkout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paymentMethod\": \"credit_card\",\n  \"shippingAddress\": \"123 Calle Principal, Ciudad, País\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/checkout",
+              "host": ["{{base_url}}"],
+              "path": ["orders", "checkout"]
+            },
+            "description": "Realizar checkout del carrito y crear una orden"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orders/me",
+              "host": ["{{base_url}}"],
+              "path": ["orders", "me"]
+            },
+            "description": "Obtener todas las órdenes del usuario autenticado"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Order by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orders/1",
+              "host": ["{{base_url}}"],
+              "path": ["orders", "1"]
+            },
+            "description": "Obtener una orden específica por ID"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

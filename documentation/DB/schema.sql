@@ -1,10 +1,10 @@
 -- -------------------------------------------------------------------
 -- Esquema
 -- -------------------------------------------------------------------
-CREATE DATABASE IF NOT EXISTS shop_app
+CREATE DATABASE IF NOT EXISTS prueba-tecnica
   DEFAULT CHARACTER SET utf8mb4
   DEFAULT COLLATE utf8mb4_0900_ai_ci;
-USE shop_app;
+USE prueba-tecnica;
 
 -- -------------------------------------------------------------------
 -- Tabla: users

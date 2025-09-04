@@ -1,23 +1,31 @@
 package com.example.prueba_tecnica_api_rest.dto;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ApiResponse<T> {
-    private boolean success;
+    @Builder.Default
+    private boolean success = false;
+    @Builder.Default
     private int httpStatus = 200;
     private String appCode;
     private String message;
     private T data;
-    private List<ErrorDetail> errors;
-    private Meta meta;
-
-    public ApiResponse() {
-        this.errors = new ArrayList<>();
-        this.meta = new Meta();
-    }
+    @Builder.Default
+    private List<ErrorDetail> errors = new ArrayList<>();
+    @Builder.Default
+    private Meta meta = new Meta();
     public static <T> ApiResponse<T> success(T data, String message, String appCode) {
         return success(data, message, appCode, 200);
     }
@@ -56,140 +64,25 @@ public class ApiResponse<T> {
         this.meta.durationMs = durationMs;
     }
 
-    // Getters and setters
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public int getHttpStatus() {
-        return httpStatus;
-    }
-
-    public void setHttpStatus(int httpStatus) {
-        this.httpStatus = httpStatus;
-    }
-
-    public String getAppCode() {
-        return appCode;
-    }
-
-    public void setAppCode(String appCode) {
-        this.appCode = appCode;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public void setData(T data) {
-        this.data = data;
-    }
-
-    public List<ErrorDetail> getErrors() {
-        return errors;
-    }
-
-    public void setErrors(List<ErrorDetail> errors) {
-        this.errors = errors;
-    }
-
-    public Meta getMeta() {
-        return meta;
-    }
-
-    public void setMeta(Meta meta) {
-        this.meta = meta;
-    }
-
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     public static class ErrorDetail {
         private String appCode;
         private String message;
-
-        public ErrorDetail() {}
-
-        public ErrorDetail(String appCode, String message) {
-            this.appCode = appCode;
-            this.message = message;
-        }
-
-        public String getAppCode() {
-            return appCode;
-        }
-
-        public void setAppCode(String appCode) {
-            this.appCode = appCode;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
     }
 
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     public static class Meta {
-        private String requestId;
+        @Builder.Default
+        private String requestId = UUID.randomUUID().toString();
         private Instant timestamp;
         private String service;
         private String version;
         private long durationMs;
-
-        public Meta() {
-            this.requestId = UUID.randomUUID().toString();
-        }
-
-        public String getRequestId() {
-            return requestId;
-        }
-
-        public void setRequestId(String requestId) {
-            this.requestId = requestId;
-        }
-
-        public Instant getTimestamp() {
-            return timestamp;
-        }
-
-        public void setTimestamp(Instant timestamp) {
-            this.timestamp = timestamp;
-        }
-
-        public String getService() {
-            return service;
-        }
-
-        public void setService(String service) {
-            this.service = service;
-        }
-
-        public String getVersion() {
-            return version;
-        }
-
-        public void setVersion(String version) {
-            this.version = version;
-        }
-
-        public long getDurationMs() {
-            return durationMs;
-        }
-
-        public void setDurationMs(long durationMs) {
-            this.durationMs = durationMs;
-        }
     }
 }
