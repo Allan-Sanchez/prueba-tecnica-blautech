@@ -56,7 +56,20 @@
       "Read(/C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\backend-api/**)",
       "Read(/C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\frontend-store\\src\\store/**)",
       "Read(/C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\frontend-store\\src\\pages/**)",
-      "Read(/C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\frontend-store/**)"
+      "Read(/C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\frontend-store/**)",
+      "Read(/C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\backend-api\\src/**)",
+      "Read(/C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\backend-api\\src\\main\\java/**)",
+      "Read(/C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\backend-api\\src\\main\\java\\com\\example\\prueba_tecnica_api_rest/**)",
+      "Read(/C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\backend-api/**)",
+      "Read(/C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\backend-api/**)",
+      "Read(/C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\backend-api\\src\\main\\resources/**)",
+      "Read(/C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\backend-api/**)",
+      "Bash(curl:*)",
+      "Read(/C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\backend-api\\src\\main\\java\\com\\example\\prueba_tecnica_api_rest\\controller/**)",
+      "Read(/C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\frontend-store\\src\\types/**)",
+      "Read(/C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\backend-api/**)",
+      "Bash(taskkill:*)",
+      "Read(/C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\backend-api/**)"
     ],
     "deny": [],
     "ask": []
