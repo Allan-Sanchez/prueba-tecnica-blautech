@@ -25,11 +25,11 @@ public class ConfigurationController {
         
         try {
             List<ConfigurationDto> configurations = configurationService.getAllConfigurations();
-            
             ApiResponse<List<ConfigurationDto>> response = ApiResponse.success(
-                configurations, 
-                "Configuraciones obtenidas.", 
-                "OK"
+                    configurations,
+                    "Configuraciones obtenidas",
+                    "OK",
+                    201
             );
             
             response.setDurationMs(System.currentTimeMillis() - startTime);
@@ -51,10 +51,9 @@ public class ConfigurationController {
     @GetMapping("/{key}")
     public ResponseEntity<ApiResponse<ConfigurationDto>> getConfigurationByKey(@PathVariable String key) {
         long startTime = System.currentTimeMillis();
-        
         try {
             ConfigurationDto configuration = configurationService.getConfigurationByKey(key);
-            
+
             if (configuration == null) {
                 ApiResponse<ConfigurationDto> errorResponse = ApiResponse.error(
                     404, 

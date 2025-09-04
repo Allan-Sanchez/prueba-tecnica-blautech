@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public class ApiResponse<T> {
     private boolean success;
-    private int httpStatus;
+    private int httpStatus = 200;
     private String appCode;
     private String message;
     private T data;
@@ -18,11 +18,14 @@ public class ApiResponse<T> {
         this.errors = new ArrayList<>();
         this.meta = new Meta();
     }
-
     public static <T> ApiResponse<T> success(T data, String message, String appCode) {
+        return success(data, message, appCode, 200);
+    }
+
+    public static <T> ApiResponse<T> success(T data, String message, String appCode, int httpStatus ) {
         ApiResponse<T> response = new ApiResponse<>();
         response.success = true;
-        response.httpStatus = 200;
+        response.httpStatus = httpStatus;
         response.appCode = appCode;
         response.message = message;
         response.data = data;
