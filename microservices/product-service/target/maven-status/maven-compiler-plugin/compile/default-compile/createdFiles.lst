@@ -1,0 +1,10 @@
+com\pruebatecnica\productservice\dto\ApiResponse$Meta$MetaBuilder.class
+com\pruebatecnica\productservice\dto\ApiResponse$ErrorDetail.class
+com\pruebatecnica\productservice\controller\ProductController.class
+com\pruebatecnica\productservice\entity\Product$ProductBuilder.class
+com\pruebatecnica\productservice\entity\Product.class
+com\pruebatecnica\productservice\ProductServiceApplication.class
+com\pruebatecnica\productservice\dto\ApiResponse.class
+com\pruebatecnica\productservice\dto\ApiResponse$Meta.class
+com\pruebatecnica\productservice\dto\ApiResponse$ApiResponseBuilder.class
+com\pruebatecnica\productservice\dto\ApiResponse$ErrorDetail$ErrorDetailBuilder.class

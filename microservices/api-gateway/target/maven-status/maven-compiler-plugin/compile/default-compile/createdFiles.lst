@@ -1,0 +1,3 @@
+com\pruebatecnica\apigateway\ApiGatewayApplication.class
+com\pruebatecnica\apigateway\filter\JwtAuthenticationFilter.class
+com\pruebatecnica\apigateway\filter\JwtAuthenticationFilter$Config.class
