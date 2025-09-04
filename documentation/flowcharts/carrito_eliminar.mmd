@@ -1,0 +1,7 @@
+flowchart TD
+  A[DELETE /cart/items/:productId] --> B[Validar JWT y cart ACTIVE]
+  B --> C{existe ítem?}
+  C -->|No| E[[404 RESOURCE_NOT_FOUND]]
+  C -->|Sí| D[Eliminar ítem y recalcular]
+  D --> F[Registrar evento cart.item_removed]
+  F --> G[[200 CART_ITEM_REMOVED]]

@@ -1,0 +1,20 @@
+sequenceDiagram
+  autonumber
+  participant FE
+  participant API
+  participant CART as Cart Service
+  participant CAT as Catalog
+  participant DB
+
+  FE->>API: POST /cart/items {productId, qty}
+  API->>CART: Proxy + userId
+  CART->>DB: SELECT/CREATE cart ACTIVE
+  CART->>CAT: GET product {id}
+  CAT-->>CART: datos producto
+  alt inactivo
+    CART-->>FE: 409 BUSINESS_RULE_VIOLATION
+  else
+    CART->>DB: UPSERT cart_items
+    CART->>DB: INSERT domain_events(cart.item_added)
+    CART-->>FE: 200 CART_ITEM_ADDED
+  end

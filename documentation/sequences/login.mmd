@@ -1,0 +1,19 @@
+sequenceDiagram
+  autonumber
+  participant FE as Frontend
+  participant API as API Gateway
+  participant AUTH as Auth Service
+  participant DB as MySQL
+
+  FE->>API: POST /auth/login {email, password}
+  API->>AUTH: Proxy
+  AUTH->>DB: SELECT user by email
+  DB-->>AUTH: user/null
+  alt inválido
+    AUTH->>DB: INSERT domain_events(user.login_failed)
+    AUTH-->>FE: 401 AUTH_INVALID_CREDENTIALS
+  else válido
+    AUTH->>AUTH: Emitir Access+Refresh
+    AUTH->>DB: INSERT refresh_tokens
+    AUTH-->>FE: 200 LOGIN_OK
+  end

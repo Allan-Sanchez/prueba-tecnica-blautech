@@ -1,0 +1,6 @@
+flowchart TD
+  A[POST /auth/refresh] --> B[Validar refresh token]
+  B -->|Inválido/Revocado| E[[401 AUTH_TOKEN_EXPIRED]]
+  B --> C[Rotación: revocar actual, emitir nuevo par]
+  C --> D[Persistir nuevo refresh jti]
+  D --> F[[200 LOGIN_OK access, refresh]]

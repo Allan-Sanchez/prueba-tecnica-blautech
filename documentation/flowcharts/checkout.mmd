@@ -1,0 +1,7 @@
+flowchart TD
+  A[POST /checkout] --> B[Obtener cart ACTIVE + items]
+  B -->|Vacío| E[[400 BUSINESS_RULE_VIOLATION]]
+  B --> C[Calcular total + crear order]
+  C --> D[Marcar cart = CHECKED_OUT]
+  D --> F[Evento order.created]
+  F --> G[[201 ORDER_CREATED orderId]]

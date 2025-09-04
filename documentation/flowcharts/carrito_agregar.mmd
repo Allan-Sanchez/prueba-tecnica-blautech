@@ -1,0 +1,6 @@
+flowchart TD
+  A[POST /cart/items] --> B[Validar JWT y producto]
+  B --> C{producto activo?}
+  C -->|No| E[[409 BUSINESS_RULE_VIOLATION]]
+  C -->|Sí| D[UPSERT cart_items]
+  D --> F[[200 CART_ITEM_ADDED]]

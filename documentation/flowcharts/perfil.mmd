@@ -1,0 +1,7 @@
+flowchart TD
+  A[GET /users/me] --> B[Validar JWT]
+  B --> C[Obtener user por id]
+  C --> D[[200 PROFILE_FETCHED]]
+  A2[PATCH /users/me] --> B2[Validar campos]
+  B2 --> C2[Update users]
+  C2 --> D2[[200 PROFILE_UPDATED]]

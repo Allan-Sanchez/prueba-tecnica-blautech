@@ -1,0 +1,20 @@
+sequenceDiagram
+  autonumber
+  participant FE as Frontend (React)
+  participant API as API Gateway
+  participant USR as User Service (Spring)
+  participant DB as MySQL
+
+  FE->>API: POST /users/register {form}
+  API->>USR: Proxy request
+  USR->>USR: Validar campos
+  USR->>DB: email unique?
+  DB-->>USR: ok/exists
+  alt email existe
+    USR-->>FE: 409 VALIDATION_ERROR
+  else nuevo
+    USR->>USR: Hash password (bcrypt)
+    USR->>DB: INSERT users
+    USR->>DB: INSERT domain_events(user.registered)
+    USR-->>FE: 201 USER_REGISTERED
+  end

@@ -1,0 +1,12 @@
+sequenceDiagram
+  autonumber
+  participant FE
+  participant API
+  participant CAT as Catalog Service
+  participant DB
+
+  FE->>API: GET /products
+  API->>CAT: Proxy
+  CAT->>DB: SELECT productos activos
+  DB-->>CAT: rows
+  CAT-->>FE: 200 PRODUCT_LISTED

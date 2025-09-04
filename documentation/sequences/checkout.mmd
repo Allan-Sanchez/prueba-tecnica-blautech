@@ -1,0 +1,19 @@
+sequenceDiagram
+  autonumber
+  participant FE
+  participant API
+  participant ORD as Order Service
+  participant DB
+
+  FE->>API: POST /checkout
+  API->>ORD: Proxy + userId
+  ORD->>DB: SELECT cart ACTIVE + items
+  alt vacío
+    ORD-->>FE: 400 CART_EMPTY
+  else
+    ORD->>ORD: Calcular total
+    ORD->>DB: INSERT orders + order_items
+    ORD->>DB: UPDATE carts.status=CHECKED_OUT
+    ORD->>DB: INSERT domain_events(order.created)
+    ORD-->>FE: 201 ORDER_CREATED {orderId}
+  end

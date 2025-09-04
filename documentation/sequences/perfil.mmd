@@ -1,0 +1,18 @@
+sequenceDiagram
+  autonumber
+  participant FE
+  participant API
+  participant USR as User Service
+  participant DB
+
+  FE->>API: GET /users/me (Bearer)
+  API->>USR: userId
+  USR->>DB: SELECT users
+  DB-->>USR: row
+  USR-->>FE: 200 PROFILE_FETCHED
+
+  FE->>API: PATCH /users/me {data}
+  API->>USR: Proxy
+  USR->>USR: Validar campos
+  USR->>DB: UPDATE users
+  USR-->>FE: 200 PROFILE_UPDATED

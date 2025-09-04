@@ -1,0 +1,8 @@
+flowchart TD
+  A[POST /users/register] --> B[Validar payload]
+  B -->|Inválido| E[[400 VALIDATION_ERROR]]
+  B --> C{email ya existe?}
+  C -->|Sí| F[[409 VALIDATION_ERROR email]]
+  C -->|No| D[Hash password + Insert user]
+  D --> G[Registrar evento user.registered]
+  G --> H[[201 USER_REGISTERED]]
