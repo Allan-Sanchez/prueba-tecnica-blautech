@@ -16,7 +16,7 @@ interface ProfileFormData {
 const Profile: React.FC = () => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
-  const { showAlert } = useAlert()
+  const { showAlert, showConfirm } = useAlert()
   const { user, isAuthenticated } = useAppSelector(state => state.auth)
   
   const { data: profileResponse, isLoading: profileLoading } = useGetProfileQuery(undefined, {
@@ -87,21 +87,24 @@ const Profile: React.FC = () => {
   }
 
   const handleLogout = async () => {
-    if (window.confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-      try {
-        await logoutMutation().unwrap()
-      } catch (error) {
-        console.error('Logout error:', error)
-      } finally {
-        dispatch(logout())
-        dispatch(clearCart())
-        showAlert({
-          type: 'info',
-          message: 'Sesión cerrada correctamente'
-        })
-        navigate('/login', { replace: true })
-      }
-    }
+
+              showConfirm(
+                '¿Estás seguro de que quieres cerrar sesión?',
+                async () => {
+                  await logoutMutation().unwrap()
+                        dispatch(logout())
+                        dispatch(clearCart())
+                       showAlert({
+                          type: 'info',
+                          message: 'Sesión cerrada correctamente'
+                        })
+                        navigate('/', { replace: true })
+    
+                            },
+                            'Cerrar Sesión'
+              )
+
+
   }
 
   const cancelEdit = () => {

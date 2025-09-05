@@ -38,9 +38,9 @@ const AlertItem: React.FC<AlertItemProps> = ({ alert }) => {
 
   return (
     <div className={`alert alert--${alert.type}`}>
-      <div className="alert__icon">
+      {/* <div className="alert__icon">
         {getAlertIcon(alert.type)}
-      </div>
+      </div> */}
       
       <div className="alert__content">
         {alert.title && (

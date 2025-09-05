@@ -34,7 +34,7 @@ public class OrderController {
         
         try {
             Long userId = getUserIdFromRequest(request);
-            if (userId == null) {
+                if (userId == null) {
                 return createUnauthorizedResponse("Se requiere autenticación para ver las órdenes");
             }
             
