@@ -1,21 +1,20 @@
 // Alert System Styles
 .alert-container {
   position: fixed;
-  top: 1rem;
-  right: 1rem;
-  left: 1rem;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 9999;
   pointer-events: none;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   max-width: 400px;
-  margin: 0 auto;
+  width: 90%;
 
   @media (min-width: 640px) {
-    left: auto;
-    right: 1rem;
-    margin: 0;
+    width: auto;
+    min-width: 400px;
   }
 }
 
@@ -62,6 +61,11 @@
   &--info {
     border-left-color: #3b82f6;
     &::before { background: #3b82f6; }
+  }
+
+  &--confirm {
+    border-left-color: #f59e0b;
+    &::before { background: #f59e0b; }
   }
 
   &__icon {
@@ -117,6 +121,48 @@
     }
   }
 
+  &__confirm-btn {
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &__cancel-btn {
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #4b5563;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
   &__close {
     background: transparent;
     border: none;
@@ -147,11 +193,11 @@
 @keyframes alertSlideIn {
   from {
     opacity: 0;
-    transform: translateX(100%);
+    transform: translateY(-100%);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
 }
 

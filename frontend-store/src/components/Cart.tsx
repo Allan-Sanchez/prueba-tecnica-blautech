@@ -1,10 +1,12 @@
 import React from 'react'
 import { useAppSelector, useAppDispatch } from '../store/hooks'
 import { removeFromCart, updateQuantity, clearCart, setCartOpen } from '../store/cartSlice'
+import { useAlert } from '../contexts/AlertContext'
 
 const Cart: React.FC = () => {
   const dispatch = useAppDispatch()
   const { items, totalItems, totalPrice, isOpen } = useAppSelector(state => state.cart)
+  const { showConfirm } = useAlert()
 
   const formatPrice = (price: number) => {
     console.log("🚀 ~ formatPrice ~ number:", price)
@@ -23,9 +25,14 @@ const Cart: React.FC = () => {
   }
 
   const handleClearCart = () => {
-    if (window.confirm('¿Estás seguro de que quieres vaciar el carrito?')) {
-      dispatch(clearCart())
-    }
+    console.log("🚀 ~ handleClearCart ~ items: LLEGO A ELIMINAR EL CARRITO")
+    showConfirm(
+      '¿Estás seguro de que quieres vaciar el carrito? Esta acción no se puede deshacer.',
+      () => {
+        dispatch(clearCart())
+      },
+      'Vaciar Carrito'
+    )
   }
 
   const handleCheckout = () => {

@@ -29,6 +29,8 @@ const AlertItem: React.FC<AlertItemProps> = ({ alert }) => {
         return '⚠️'
       case 'info':
         return 'ℹ️'
+      case 'confirm':
+        return '❓'
       default:
         return '📢'
     }
@@ -48,22 +50,41 @@ const AlertItem: React.FC<AlertItemProps> = ({ alert }) => {
       </div>
 
       <div className="alert__actions">
-        {alert.action && (
-          <button
-            className="alert__action-btn"
-            onClick={alert.action.onClick}
-          >
-            {alert.action.label}
-          </button>
+        {alert.type === 'confirm' ? (
+          <>
+            <button
+              className="alert__confirm-btn"
+              onClick={alert.onConfirm}
+            >
+              Confirmar
+            </button>
+            <button
+              className="alert__cancel-btn"
+              onClick={alert.onCancel}
+            >
+              Cancelar
+            </button>
+          </>
+        ) : (
+          <>
+            {alert.action && (
+              <button
+                className="alert__action-btn"
+                onClick={alert.action.onClick}
+              >
+                {alert.action.label}
+              </button>
+            )}
+            
+            <button
+              className="alert__close"
+              onClick={() => removeAlert(alert.id)}
+              aria-label="Cerrar alerta"
+            >
+              ×
+            </button>
+          </>
         )}
-        
-        <button
-          className="alert__close"
-          onClick={() => removeAlert(alert.id)}
-          aria-label="Cerrar alerta"
-        >
-          ×
-        </button>
       </div>
     </div>
   )
