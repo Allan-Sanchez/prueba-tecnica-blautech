@@ -29,14 +29,14 @@ export const cartApiEndpoints = baseCartApi.injectEndpoints({
   endpoints: (builder) => ({
     // Get user's cart
     getCart: builder.query<ApiResponse<ServerCart>, void>({
-      query: () => '/cart',
+      query: () => 'api/cart',
       providesTags: ['Cart'],
     }),
 
     // Add item to cart
     addToCart: builder.mutation<ApiResponse<ServerCartItem>, CartItemRequest>({
       query: (item) => ({
-        url: '/cart/items',
+        url: 'api/cart/items',
         method: 'POST',
         body: item,
       }),
@@ -46,7 +46,7 @@ export const cartApiEndpoints = baseCartApi.injectEndpoints({
     // Update cart item quantity
     updateCartItem: builder.mutation<ApiResponse<ServerCartItem>, { itemId: number; quantity: number }>({
       query: ({ itemId, quantity }) => ({
-        url: `/cart/items/${itemId}`,
+        url: `api/cart/items/${itemId}`,
         method: 'PUT',
         body: { quantity },
       }),
@@ -56,7 +56,7 @@ export const cartApiEndpoints = baseCartApi.injectEndpoints({
     // Remove item from cart
     removeCartItem: builder.mutation<ApiResponse<void>, number>({
       query: (itemId) => ({
-        url: `/cart/items/${itemId}`,
+        url: `api/cart/items/${itemId}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['Cart'],
@@ -65,7 +65,7 @@ export const cartApiEndpoints = baseCartApi.injectEndpoints({
     // Clear entire cart
     clearCart: builder.mutation<ApiResponse<void>, void>({
       query: () => ({
-        url: '/cart/clear',
+        url: 'api/cart/clear',
         method: 'POST',
       }),
       invalidatesTags: ['Cart'],
@@ -74,7 +74,7 @@ export const cartApiEndpoints = baseCartApi.injectEndpoints({
     // Apply coupon to cart
     applyCoupon: builder.mutation<ApiResponse<ServerCart>, { couponCode: string }>({
       query: ({ couponCode }) => ({
-        url: '/cart/coupon',
+        url: 'api/cart/coupon',
         method: 'POST',
         body: { couponCode },
       }),
@@ -84,7 +84,7 @@ export const cartApiEndpoints = baseCartApi.injectEndpoints({
     // Remove coupon from cart
     removeCoupon: builder.mutation<ApiResponse<ServerCart>, void>({
       query: () => ({
-        url: '/cart/coupon',
+        url: 'api/cart/coupon',
         method: 'DELETE',
       }),
       invalidatesTags: ['Cart'],
@@ -99,7 +99,7 @@ export const cartApiEndpoints = baseCartApi.injectEndpoints({
       total: number;
       itemCount: number;
     }>, void>({
-      query: () => '/cart/summary',
+      query: () => 'api/cart/summary',
       providesTags: ['Cart'],
     }),
 
@@ -113,7 +113,7 @@ export const cartApiEndpoints = baseCartApi.injectEndpoints({
         message: string;
       }>;
     }>, void>({
-      query: () => '/cart/validate',
+      query: () => 'api/cart/validate',
       providesTags: ['Cart'],
     }),
 
@@ -130,7 +130,7 @@ export const cartApiEndpoints = baseCartApi.injectEndpoints({
     // Save cart for later (wishlist functionality)
     saveForLater: builder.mutation<ApiResponse<void>, number>({
       query: (itemId) => ({
-        url: `/cart/items/${itemId}/save-for-later`,
+        url: `api/cart/items/${itemId}/save-for-later`,
         method: 'POST',
       }),
       invalidatesTags: ['Cart'],
@@ -139,7 +139,7 @@ export const cartApiEndpoints = baseCartApi.injectEndpoints({
     // Move item from saved for later back to cart
     moveToCart: builder.mutation<ApiResponse<ServerCartItem>, number>({
       query: (itemId) => ({
-        url: `/cart/saved-items/${itemId}/move-to-cart`,
+        url: `api/cart/saved-items/${itemId}/move-to-cart`,
         method: 'POST',
       }),
       invalidatesTags: ['Cart'],
@@ -147,7 +147,7 @@ export const cartApiEndpoints = baseCartApi.injectEndpoints({
 
     // Get saved for later items
     getSavedItems: builder.query<ApiResponse<ServerCartItem[]>, void>({
-      query: () => '/cart/saved-items',
+      query: () => 'api/cart/saved-items',
       providesTags: ['Cart'],
     }),
   }),

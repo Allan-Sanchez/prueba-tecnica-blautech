@@ -6,11 +6,17 @@ export const orderApiEndpoints = baseOrderApi.injectEndpoints({
   endpoints: (builder) => ({
     // Create new order
     createOrder: builder.mutation<ApiResponse<Order>, CreateOrderRequest>({
-      query: (orderData) => ({
-        url: '/orders',
-        method: 'POST',
-        body: orderData,
-      }),
+      query: (orderData) => (
+        {
+          url: 'api/orders',
+          method: 'POST',
+          body: orderData,
+          headers: {
+            'X-User-Id': orderData.userId?.toString() || '',
+            'X-User-Email': orderData.userEmail || '',
+          }
+        }
+      ),
       invalidatesTags: ['Order', 'Cart'],
     }),
 
@@ -43,14 +49,14 @@ export const orderApiEndpoints = baseOrderApi.injectEndpoints({
 
     // Get order by ID
     getOrder: builder.query<ApiResponse<Order>, number>({
-      query: (id) => `/orders/${id}`,
+      query: (id) => `api/orders/${id}`,
       providesTags: (result, error, id) => [{ type: 'Order', id }],
     }),
 
     // Update order status (admin/system)
     updateOrderStatus: builder.mutation<ApiResponse<Order>, { id: number; status: OrderStatus; reason?: string }>({
       query: ({ id, status, reason }) => ({
-        url: `/orders/${id}/status`,
+        url: `api/orders/${id}/status`,
         method: 'PATCH',
         body: { status, reason },
       }),
@@ -60,7 +66,7 @@ export const orderApiEndpoints = baseOrderApi.injectEndpoints({
     // Cancel order
     cancelOrder: builder.mutation<ApiResponse<Order>, { id: number; reason: string }>({
       query: ({ id, reason }) => ({
-        url: `/orders/${id}/cancel`,
+        url: `api/orders/${id}/cancel`,
         method: 'POST',
         body: { reason },
       }),
@@ -80,7 +86,7 @@ export const orderApiEndpoints = baseOrderApi.injectEndpoints({
       estimatedDelivery?: string;
       trackingNumber?: string;
     }>, number>({
-      query: (orderId) => `/orders/${orderId}/tracking`,
+      query: (orderId) => `api/orders/${orderId}/tracking`,
       providesTags: (result, error, orderId) => [{ type: 'Order', id: orderId }],
     }),
 
@@ -168,7 +174,7 @@ export const orderApiEndpoints = baseOrderApi.injectEndpoints({
       };
     }>({
       query: ({ orderId, paymentDetails }) => ({
-        url: `/orders/${orderId}/payment`,
+        url: `api/orders/${orderId}/payment`,
         method: 'POST',
         body: paymentDetails,
       }),
@@ -186,7 +192,7 @@ export const orderApiEndpoints = baseOrderApi.injectEndpoints({
       items?: number[];
     }>({
       query: ({ orderId, reason, items }) => ({
-        url: `/orders/${orderId}/refund`,
+        url: `api/orders/${orderId}/refund`,
         method: 'POST',
         body: { reason, items },
       }),
@@ -196,7 +202,7 @@ export const orderApiEndpoints = baseOrderApi.injectEndpoints({
     // Reorder (create new order from existing order)
     reorder: builder.mutation<ApiResponse<Order>, number>({
       query: (orderId) => ({
-        url: `/orders/${orderId}/reorder`,
+        url: `api/orders/${orderId}/reorder`,
         method: 'POST',
       }),
       invalidatesTags: ['Order'],

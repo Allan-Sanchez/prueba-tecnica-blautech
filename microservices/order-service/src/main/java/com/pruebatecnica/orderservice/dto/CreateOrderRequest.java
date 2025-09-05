@@ -34,4 +34,9 @@ public class CreateOrderRequest {
     
     @Size(max = 100, message = "La referencia de pago no puede exceder 100 caracteres")
     private String paymentReference;
+
+//    userId se obtiene del token JWT y no se envía en la solicitud
+     private Long userId;
+//     userEmail se obtiene del token JWT y no se envía en la solicitud
+        private String userEmail;
 }

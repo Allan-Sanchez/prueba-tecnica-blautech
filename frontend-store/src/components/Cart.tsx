@@ -72,17 +72,13 @@ const Cart: React.FC = () => {
           pricePerUnit: item.product.priceInCurrency
         })),
         // Dirección y método de pago por defecto - se pueden obtener del perfil del usuario o un formulario
-        shippingAddress: {
-          street: 'Dirección por defecto',
-          city: 'Ciudad',
-          state: 'Estado',
-          zipCode: '01001',
-          country: 'Guatemala'
-        },
-        paymentMethod: {
-          type: 'CASH_ON_DELIVERY',
-          details: 'Pago contra entrega'
-        }
+        shippingAddress: user?.shippingAddress || 'Dirección por defecto',
+        billingAddress: user?.shippingAddress || 'Dirección por defecto',
+        userEmail: user?.email || 'temporal@ejemplo.com',
+        userId: user?.id || 0,
+        paymentMethod: 'CASH_ON_DELIVERY',
+        paymentReference: 'Referencia de pago',
+        notes: 'pago al recibir'
       }
 
       const response = await createOrder(orderRequest).unwrap()

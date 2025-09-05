@@ -147,12 +147,17 @@ public class OrderController {
     public ResponseEntity<ApiResponse<OrderDto>> createOrder(
             @Valid @RequestBody CreateOrderRequest request,
             HttpServletRequest httpRequest) {
-        
+//        log para ver el body del request
+        log.info("CreateOrderRequest: {}", request);
         try {
+            log.info("--------------create order -------------");
             Long userId = getUserIdFromRequest(httpRequest);
+            log.info("userId: {}", userId);
             String userEmail = getUserEmailFromRequest(httpRequest);
+            log.info("userEmail: {}", userEmail);
             
             if (userId == null || userEmail == null) {
+                log.warn("User ID or email missing in request headers");
                 return createUnauthorizedResponse("Se requiere autenticación para crear una orden");
             }
             

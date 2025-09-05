@@ -55,6 +55,7 @@ export interface User {
   isActive: boolean
   createdAt: string
   updatedAt: string
+  shippingAddress?: string
 }
 
 export interface AuthResponse {
@@ -101,10 +102,12 @@ export interface Order {
   items: OrderItem[]
   totalAmount: number
   status: OrderStatus
-  shippingAddress: Address
-  paymentMethod: PaymentMethod
+  shippingAddress: string
+  paymentMethod: string
+  notes?: string
   createdAt: string
   updatedAt: string
+  userEmail: string
 }
 
 export interface OrderItem {
@@ -133,6 +136,6 @@ export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | '
 
 export interface CreateOrderRequest {
   items: CartItemRequest[]
-  shippingAddress: Address
-  paymentMethod: PaymentMethod
-}
+  shippingAddress: string
+  paymentMethod: string
+  notes?: string
