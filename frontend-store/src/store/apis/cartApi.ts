@@ -24,7 +24,6 @@ export interface ServerCartItem {
   updatedAt: string
 }
 
-// Cart Service API (Puerto 8083) - Direct connection to VITE_URL_CART
 export const cartApiEndpoints = baseCartApi.injectEndpoints({
   endpoints: (builder) => ({
     // Get user's cart
@@ -90,66 +89,6 @@ export const cartApiEndpoints = baseCartApi.injectEndpoints({
       invalidatesTags: ['Cart'],
     }),
 
-    // Get cart summary (totals, taxes, shipping)
-    getCartSummary: builder.query<ApiResponse<{
-      subtotal: number;
-      tax: number;
-      shipping: number;
-      discount: number;
-      total: number;
-      itemCount: number;
-    }>, void>({
-      query: () => 'api/cart/summary',
-      providesTags: ['Cart'],
-    }),
-
-    // Validate cart (check stock availability, prices, etc.)
-    validateCart: builder.query<ApiResponse<{
-      isValid: boolean;
-      issues: Array<{
-        itemId: number;
-        productId: number;
-        issue: 'OUT_OF_STOCK' | 'INSUFFICIENT_STOCK' | 'PRICE_CHANGED' | 'PRODUCT_INACTIVE';
-        message: string;
-      }>;
-    }>, void>({
-      query: () => 'api/cart/validate',
-      providesTags: ['Cart'],
-    }),
-
-    // Merge guest cart with user cart (after login)
-    mergeCart: builder.mutation<ApiResponse<ServerCart>, { guestCartItems: CartItemRequest[] }>({
-      query: ({ guestCartItems }) => ({
-        url: '/cart/merge',
-        method: 'POST',
-        body: { items: guestCartItems },
-      }),
-      invalidatesTags: ['Cart'],
-    }),
-
-    // Save cart for later (wishlist functionality)
-    saveForLater: builder.mutation<ApiResponse<void>, number>({
-      query: (itemId) => ({
-        url: `api/cart/items/${itemId}/save-for-later`,
-        method: 'POST',
-      }),
-      invalidatesTags: ['Cart'],
-    }),
-
-    // Move item from saved for later back to cart
-    moveToCart: builder.mutation<ApiResponse<ServerCartItem>, number>({
-      query: (itemId) => ({
-        url: `api/cart/saved-items/${itemId}/move-to-cart`,
-        method: 'POST',
-      }),
-      invalidatesTags: ['Cart'],
-    }),
-
-    // Get saved for later items
-    getSavedItems: builder.query<ApiResponse<ServerCartItem[]>, void>({
-      query: () => 'api/cart/saved-items',
-      providesTags: ['Cart'],
-    }),
   }),
 })
 
@@ -162,13 +101,12 @@ export const {
   useClearCartMutation,
   useApplyCouponMutation,
   useRemoveCouponMutation,
-  useGetCartSummaryQuery,
-  useValidateCartQuery,
-  useMergeCartMutation,
-  useSaveForLaterMutation,
-  useMoveToCartMutation,
-  useGetSavedItemsQuery,
+  // useGetCartSummaryQuery,
+  // useValidateCartQuery,
+  // useMergeCartMutation,
+  // useSaveForLaterMutation,
+  // useMoveToCartMutation,
+  // useGetSavedItemsQuery,
 } = cartApiEndpoints
 
-// Export the base cart API instance for store configuration
 export { baseCartApi as cartApi }

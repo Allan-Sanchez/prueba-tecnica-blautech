@@ -33,7 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     <div className="product-card">
       <div className="product-image">
         {product.imageUrl ? (
-          <img src={product.imageUrl} alt={product.name} />
+          <img src={product.imageUrl} alt={product.name} loading="lazy" />
         ) : (
           <div className="product-placeholder">
             📦

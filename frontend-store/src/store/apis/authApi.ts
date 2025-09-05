@@ -4,8 +4,6 @@ import type { ApiResponse, AuthResponse, LoginRequest, RegisterRequest, User } f
 // Auth Service API (Puerto 8081) - Direct connection to VITE_URL_AUTH
 export const authApiEndpoints = baseAuthApi.injectEndpoints({
   endpoints: (builder) => ({
-    // Authentication endpoints
-    // Authentication endpoints - Direct to Auth Service
     login: builder.mutation<ApiResponse<AuthResponse>, LoginRequest>({
       query: (credentials) => ({
         url: 'api/auth/login',
@@ -56,27 +54,27 @@ export const authApiEndpoints = baseAuthApi.injectEndpoints({
       invalidatesTags: ['Auth', 'User'],
     }),
 
-    // User list (admin only)
-    getAllUsers: builder.query<ApiResponse<User[]>, void>({
-      query: () => 'api/users',
-      providesTags: ['User'],
-    }),
+    // // User list (admin only)
+    // getAllUsers: builder.query<ApiResponse<User[]>, void>({
+    //   query: () => 'api/users',
+    //   providesTags: ['User'],
+    // }),
 
-    // Get user by ID (admin only)
-    getUserById: builder.query<ApiResponse<User>, number>({
-      query: (id) => `api/users/${id}`,
-      providesTags: (result, error, id) => [{ type: 'User', id }],
-    }),
+    // // Get user by ID (admin only)
+    // getUserById: builder.query<ApiResponse<User>, number>({
+    //   query: (id) => `api/users/${id}`,
+    //   providesTags: (result, error, id) => [{ type: 'User', id }],
+    // }),
 
-    // Update user status (admin only)
-    updateUserStatus: builder.mutation<ApiResponse<User>, { id: number; isActive: boolean }>({
-      query: ({ id, isActive }) => ({
-        url: `api/users/${id}/status`,
-        method: 'PATCH',
-        body: { isActive },
-      }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'User', id }],
-    }),
+    // // Update user status (admin only)
+    // updateUserStatus: builder.mutation<ApiResponse<User>, { id: number; isActive: boolean }>({
+    //   query: ({ id, isActive }) => ({
+    //     url: `api/users/${id}/status`,
+    //     method: 'PATCH',
+    //     body: { isActive },
+    //   }),
+    //   invalidatesTags: (result, error, { id }) => [{ type: 'User', id }],
+    // }),
   }),
 })
 
@@ -88,9 +86,9 @@ export const {
   useGetProfileQuery,
   useUpdateProfileMutation,
   useLogoutMutation,
-  useGetAllUsersQuery,
-  useGetUserByIdQuery,
-  useUpdateUserStatusMutation,
+  // useGetAllUsersQuery,
+  // useGetUserByIdQuery,
+  // useUpdateUserStatusMutation,
 } = authApiEndpoints
 
 // Export the base auth API instance for store configuration

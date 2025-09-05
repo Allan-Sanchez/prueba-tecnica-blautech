@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useAppSelector, useAppDispatch } from '../store/hooks'
@@ -66,8 +66,10 @@ const Login: React.FC = () => {
   }
 
   if (isAuthenticated) {
-    return null // Will redirect via useEffect
+    return null 
   }
+
+  const [showPassword, setShowPassword] = useState(false)
 
   return (
     <div className="auth-page">
@@ -103,7 +105,7 @@ const Login: React.FC = () => {
               )}
             </div>
 
-            <div className="form-group">
+            <div className="form-group" style={{ position: 'relative' }}>
               <label htmlFor="password">Contraseña</label>
               <input
                 {...register('password', {
@@ -113,13 +115,36 @@ const Login: React.FC = () => {
                     message: 'La contraseña debe tener al menos 6 caracteres'
                   }
                 })}
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 id="password"
                 className={errors.password ? 'error' : ''}
                 placeholder="Tu contraseña"
                 disabled={loginLoading || isLoading || isSubmitting}
                 autoComplete="current-password"
               />
+              <button
+                type="button"
+                tabIndex={-1}
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                onClick={() => setShowPassword((prev) => !prev)}
+                style={{
+                  position: 'absolute',
+                  right: 10,
+                  top: 42,
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0
+                }}
+              >
+                {showPassword ? (
+                  // Ojo abierto SVG
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                ) : (
+                  // Ojo cerrado SVG
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.81 21.81 0 0 1 5.06-6.06M1 1l22 22"></path><path d="M9.53 9.53A3.5 3.5 0 0 0 12 15.5a3.5 3.5 0 0 0 2.47-5.97"></path></svg>
+                )}
+              </button>
               {errors.password && (
                 <span className="field-error">{errors.password.message}</span>
               )}

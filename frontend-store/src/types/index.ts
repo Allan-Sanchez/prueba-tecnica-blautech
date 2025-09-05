@@ -108,15 +108,21 @@ export interface Order {
   createdAt: string
   updatedAt: string
   userEmail: string
+  subtotal: number
+  shippingCost: number
+  tax: number
+  total: number
+
 }
 
 export interface OrderItem {
   id: number
   productId: number
   quantity: number
-  unitPrice: number
+  price: number
   totalPrice: number
-  product: Product
+  product: Product,
+  productName: string
 }
 
 export interface Address {
@@ -139,3 +145,4 @@ export interface CreateOrderRequest {
   shippingAddress: string
   paymentMethod: string
   notes?: string
+}

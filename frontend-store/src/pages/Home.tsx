@@ -3,9 +3,6 @@ import { useAppSelector, useAppDispatch } from '../store/hooks'
 import { initializeAuth } from '../store/authSlice'
 import { 
   useGetProductsQuery, 
-  useCreateProductMutation, 
-  useUpdateProductMutation, 
-  useDeleteProductMutation 
 } from '../store/apis'
 import { ProductCard } from '../components'
 import type { Product } from '../types'
@@ -13,25 +10,10 @@ import '../scss/pages/_home.scss'
 
 const Home: React.FC = () => {
   const dispatch = useAppDispatch()
-  const { isAuthenticated, user } = useAppSelector(state => state.auth)
+  const { isAuthenticated } = useAppSelector(state => state.auth)
   const { totalItems } = useAppSelector(state => state.cart)
   
   const { data: productsResponse, isLoading, error } = useGetProductsQuery()
-  const [createProduct] = useCreateProductMutation()
-  const [updateProduct] = useUpdateProductMutation()
-  const [deleteProduct] = useDeleteProductMutation()
-
-  const [showForm, setShowForm] = useState(false)
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    priceInCurrency: 0,
-    // stock: 0,
-    category: '',
-    imageUrl: '',
-    isActive: true
-  })
 
   useEffect(() => {
     dispatch(initializeAuth())
@@ -40,61 +22,6 @@ const Home: React.FC = () => {
   const products = productsResponse?.data || []
   console.log("🚀 ~ Home ~ products:", products)
 
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      description: '',
-      priceInCurrency: 0,
-      // stock: 0,
-      category: '',
-      imageUrl: '',
-      isActive: true
-    })
-    setEditingProduct(null)
-    setShowForm(false)
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    try {
-      if (editingProduct) {
-        await updateProduct({
-          id: editingProduct.id,
-          product: formData
-        }).unwrap()
-      } else {
-        await createProduct(formData).unwrap()
-      }
-      resetForm()
-    } catch (error) {
-      console.error('Error saving product:', error)
-    }
-  }
-
-  const handleEdit = (product: Product) => {
-    setFormData({
-      name: product.name,
-      description: product.description,
-      priceInCurrency: product.priceInCurrency,
-      // stock: product.stock,
-      category: product.category || '',
-      imageUrl: product.imageUrl || '',
-      isActive: product.isActive
-    })
-    setEditingProduct(product)
-    setShowForm(true)
-  }
-
-  const handleDelete = async (id: number) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
-      try {
-        await deleteProduct(id).unwrap()
-      } catch (error) {
-        console.error('Error deleting product:', error)
-      }
-    }
-  }
 
   if (isLoading) {
     return (
@@ -144,8 +71,8 @@ const Home: React.FC = () => {
                 <ProductCard
                   key={product.id}
                   product={product}
-                  onEdit={isAuthenticated ? handleEdit : undefined}
-                  onDelete={isAuthenticated ? handleDelete : undefined}
+                  // onEdit={isAuthenticated ? handleEdit : undefined}
+                  // onDelete={isAuthenticated ? handleDelete : undefined}
                   showActions={isAuthenticated}
                 />
               ))}
