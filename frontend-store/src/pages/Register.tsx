@@ -13,6 +13,8 @@ interface RegisterFormData {
   confirmPassword: string
   firstName: string
   lastName: string
+  shippingAddress: string
+  birthDate?: string
 }
 
 const Register: React.FC = () => {
@@ -34,7 +36,8 @@ const Register: React.FC = () => {
       password: '',
       confirmPassword: '',
       firstName: '',
-      lastName: ''
+      lastName: '',
+      shippingAddress: ''
     }
   })
 
@@ -53,17 +56,20 @@ const Register: React.FC = () => {
         email: data.email,
         password: data.password,
         firstName: data.firstName.trim(),
-        lastName: data.lastName.trim()
+        lastName: data.lastName.trim(),
+        shippingAddress: data.shippingAddress.trim(),
+        birthDate: data.birthDate?.trim()
       }
 
       const response = await register(registerData).unwrap()
+      console.log("🚀 ~ onSubmit ~ response:", response)
       
       if (response.success && response.data) {
-        dispatch(loginSuccess(response.data))
+        // dispatch(loginSuccess(response.data))
         showAlert({
           type: 'success',
           title: '¡Cuenta creada exitosamente!',
-          message: `Bienvenido, ${response.data.user.firstName}!`
+          message: `Bienvenido, ${response.data?.firstName}! por favor inicia sesión.`
         })
         navigate('/', { replace: true })
       } else {
@@ -206,6 +212,51 @@ const Register: React.FC = () => {
               />
               {errors.confirmPassword && (
                 <span className="field-error">{errors.confirmPassword.message}</span>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="shippingAddress">Dirección de Envío</label>
+              <input
+                {...registerField('shippingAddress', {
+                  required: 'La dirección de envío es requerida',
+                  minLength: {
+                    value: 5,
+                    message: 'La dirección debe tener al menos 5 caracteres'
+                  },
+                  validate: value => value.trim() !== '' || 'La dirección no puede estar vacía'
+                })}
+                type="text"
+                id="shippingAddress"
+                className={errors.shippingAddress ? 'error' : ''}
+                placeholder="Tu dirección de envío"
+                disabled={registerLoading || isSubmitting}
+                autoComplete="shipping address-line1"
+              />
+              {errors.shippingAddress && (
+                <span className="field-error">{errors.shippingAddress.message}</span>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="birthDate">Fecha de Nacimiento</label>
+              <input
+                {...registerField('birthDate', {
+                  required: 'La fecha de nacimiento es requerida',
+                  validate: value => {
+                    const date = new Date(value)
+                    return !isNaN(date.getTime()) || 'Fecha inválida'
+                  }
+                })}
+                type="date"
+                id="birthDate"
+                className={errors.birthDate ? 'error' : ''}
+                placeholder="Tu fecha de nacimiento"
+                disabled={registerLoading || isSubmitting}
+                autoComplete="bday"
+              />
+              {errors.birthDate && (
+                <span className="field-error">{errors.birthDate.message}</span>
               )}
             </div>
 

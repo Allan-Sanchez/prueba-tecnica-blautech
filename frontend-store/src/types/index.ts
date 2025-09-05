@@ -73,6 +73,8 @@ export interface RegisterRequest {
   password: string
   firstName: string
   lastName: string
+  shippingAddress: string
+  birthDate?: string
 }
 
 export interface CartItem {
