@@ -24,8 +24,8 @@ public class OrderController {
     
     private final OrderService orderService;
     
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<OrderDto>>> getUserOrders(
+    @GetMapping("/my-orders")
+    public ResponseEntity<ApiResponse<List<OrderDto>>> getMyOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String status,
@@ -38,7 +38,7 @@ public class OrderController {
                 return createUnauthorizedResponse("Se requiere autenticación para ver las órdenes");
             }
             
-            log.info("Getting orders for user ID: {} - page: {}, size: {}, status: {}, search: {}", 
+            log.info("Getting my orders for user ID: {} - page: {}, size: {}, status: {}, search: {}", 
                     userId, page, size, status, search);
             
             List<OrderDto> orders;

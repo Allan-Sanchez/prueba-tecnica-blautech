@@ -6,17 +6,11 @@ export const orderApiEndpoints = baseOrderApi.injectEndpoints({
   endpoints: (builder) => ({
     // Create new order
     createOrder: builder.mutation<ApiResponse<Order>, CreateOrderRequest>({
-      query: (orderData) => (
-        {
-          url: 'api/orders',
-          method: 'POST',
-          body: orderData,
-          headers: {
-            'X-User-Id': orderData.userId?.toString() || '',
-            'X-User-Email': orderData.userEmail || '',
-          }
-        }
-      ),
+      query: (orderData) => ({
+        url: 'api/orders',
+        method: 'POST',
+        body: orderData,
+      }),
       invalidatesTags: ['Order', 'Cart'],
     }),
 
@@ -30,6 +24,7 @@ export const orderApiEndpoints = baseOrderApi.injectEndpoints({
     } | void>({
       query: (params) => {
         const searchParams = new URLSearchParams()
+        console.log("🚀 ~ searchParams:", searchParams)
         
         if (params) {
           Object.entries(params).forEach(([key, value]) => {
@@ -40,8 +35,8 @@ export const orderApiEndpoints = baseOrderApi.injectEndpoints({
         }
 
         return {
-          url: '/orders/my-orders',
-          params: searchParams,
+          url: 'api/orders/my-orders',
+          // params: searchParams,
         }
       },
       providesTags: ['Order'],

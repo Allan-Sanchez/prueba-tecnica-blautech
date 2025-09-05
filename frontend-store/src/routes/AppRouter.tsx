@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Home, Login, Register, Profile } from '../pages';
+import { Home, Login, Register, Profile, Orders } from '../pages';
 import { Navbar, Cart, ProtectedRoute } from '../components';
 
 export const AppRouter = () => {
@@ -18,6 +18,11 @@ export const AppRouter = () => {
 						<Route path='/profile' element={
 							<ProtectedRoute>
 								<Profile />
+							</ProtectedRoute>
+						} />
+						<Route path='/orders' element={
+							<ProtectedRoute>
+								<Orders />
 							</ProtectedRoute>
 						} />
 					</Routes>

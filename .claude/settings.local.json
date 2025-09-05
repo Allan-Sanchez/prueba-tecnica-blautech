@@ -122,7 +122,8 @@
       "Bash(mvn:*)",
       "Bash(dir:*)",
       "Bash(npm install:*)",
-      "Bash(del \"C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\frontend-store\\src\\scss\\components.scss\")"
+      "Bash(del \"C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\frontend-store\\src\\scss\\components.scss\")",
+      "Bash(npm run dev:*)"
     ],
     "deny": [],
     "ask": []

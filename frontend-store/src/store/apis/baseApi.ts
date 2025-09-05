@@ -20,6 +20,27 @@ const prepareCommonHeaders = (headers: Headers) => {
   return headers
 }
 
+// Headers preparation with user context for orders
+const prepareOrderHeaders = (headers: Headers, { getState }: any) => {
+  const token = localStorage.getItem('accessToken')
+  if (token) {
+    headers.set('authorization', `Bearer ${token}`)
+  }
+  headers.set('Content-Type', 'application/json')
+  
+  // Get user info from state
+  const state = getState()
+  const user = state.auth?.user
+  console.log("🚀 ~ prepareOrderHeaders ~ user:", user)
+  
+  if (user) {
+    headers.set('X-User-Id', user.id.toString())
+    headers.set('X-User-Email', user.email)
+  }
+  
+  return headers
+}
+
 // Base query factory for each microservice
 export const createMicroserviceQuery = (baseUrl: string) => 
   fetchBaseQuery({
@@ -69,9 +90,15 @@ export const cartApi = createApi({
   endpoints: () => ({}),
 })
 
+// Order base query with user headers
+export const orderBaseQueryWithUserHeaders = fetchBaseQuery({
+  baseUrl: MICROSERVICE_URLS.ORDERS,
+  prepareHeaders: prepareOrderHeaders,
+})
+
 export const orderApi = createApi({
   reducerPath: 'orderApi',
-  baseQuery: orderBaseQuery,
+  baseQuery: orderBaseQueryWithUserHeaders,
   tagTypes: ['Order'],
   endpoints: () => ({}),
 })

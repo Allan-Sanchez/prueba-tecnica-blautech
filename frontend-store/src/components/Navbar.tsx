@@ -53,6 +53,12 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
     navigate('/profile')
   }
 
+  const handleOrdersClick = () => {
+    setShowUserMenu(false)
+    // send en searchParams userId and userEmail
+    navigate('/orders')
+  }
+
   // Close user menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -114,15 +120,19 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
                       className="dropdown-item"
                       onClick={handleProfileClick}
                     >
-                      {/* <span className="dropdown-icon">⚙️</span> */}
                       Mi Perfil
+                    </button>
+                    <button 
+                      className="dropdown-item"
+                      onClick={handleOrdersClick}
+                    >
+                      Mis Compras
                     </button>
                     <hr className="dropdown-divider" />
                     <button 
                       className="dropdown-item logout-item"
                       onClick={handleLogout}
                     >
-                      {/* <span className="dropdown-icon">🚪</span> */}
                       Cerrar Sesión
                     </button>
                   </div>
