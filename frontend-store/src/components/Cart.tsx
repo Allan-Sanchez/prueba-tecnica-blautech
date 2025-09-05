@@ -82,12 +82,13 @@ const Cart: React.FC = () => {
       }
 
       const response = await createOrder(orderRequest).unwrap()
+      console.log("🚀 ~ handleCheckout ~ response:", response)
       
       if (response.success) {
         showAlert({
           type: 'success',
           title: '¡Orden creada exitosamente!',
-          message: `Tu orden #${response.data.id} ha sido procesada. Total: ${formatPrice(response.data.totalAmount)}`,
+          message: `Tu orden #${response.data.id} ha sido procesada. Total: ${formatPrice(response.data.total)}`,
           duration: 8000
         })
         

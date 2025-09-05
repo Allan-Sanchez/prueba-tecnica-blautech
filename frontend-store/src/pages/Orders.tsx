@@ -129,7 +129,7 @@ const Orders: React.FC = () => {
                         <span className="item-quantity">x{item.quantity}</span>
                       </div>
                       <span className="item-price">
-                        {formatPrice(item.pricePerUnit * item.quantity)}
+                        {formatPrice(item.price * item.quantity)}
                       </span>
                     </div>
                   ))}
@@ -154,7 +154,7 @@ const Orders: React.FC = () => {
                   )}
                   <div className="summary-row summary-total">
                     <span>Total:</span>
-                    <span>{formatPrice(order.totalAmount)}</span>
+                    <span>{formatPrice(order.total)}</span>
                   </div>
                 </div>
               </div>
@@ -163,8 +163,7 @@ const Orders: React.FC = () => {
                 <div className="order-address">
                   <strong>Dirección de envío:</strong>
                   <p>
-                    {order.shippingAddress.street}, {order.shippingAddress.city}, 
-                    {order.shippingAddress.state} {order.shippingAddress.zipCode}
+                    {order.shippingAddress}
                   </p>
                 </div>
                 
