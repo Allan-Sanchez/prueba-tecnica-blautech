@@ -76,7 +76,7 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
       <div className="navbar-container">
         <div className="navbar-brand">
           <Link to="/" className="brand-link">
-            <h2>Frontend Store</h2>
+            <h2>Mi Tienda </h2>
           </Link>
         </div>
 

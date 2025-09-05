@@ -121,7 +121,7 @@ const Home: React.FC = () => {
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-content">
-          <h1 className="hero-title">Frontend Store</h1>
+          <h1 className="hero-title">Mi Tienda</h1>
           <p className="hero-subtitle">
             Descubre los mejores productos con la mejor tecnología
           </p>

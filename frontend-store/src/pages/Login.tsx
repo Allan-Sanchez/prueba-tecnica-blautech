@@ -76,7 +76,7 @@ const Login: React.FC = () => {
           {/* Header */}
           <div className="auth-header">
             <h1>Iniciar Sesión</h1>
-            <p>Accede a tu cuenta en Frontend Store</p>
+            <p>Accede a tu cuenta en Mi Tienda</p>
           </div>
 
           {/* Form */}

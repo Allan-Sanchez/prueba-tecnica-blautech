@@ -95,7 +95,7 @@ const Register: React.FC = () => {
           {/* Header */}
           <div className="auth-header">
             <h1>Crear Cuenta</h1>
-            <p>Únete a Frontend Store y comienza a comprar</p>
+            <p>Únete a Mi Tienda y comienza a comprar</p>
           </div>
 
           {/* Form */}
