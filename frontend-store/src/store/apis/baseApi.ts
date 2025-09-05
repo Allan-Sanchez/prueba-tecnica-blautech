@@ -11,7 +11,8 @@ const MICROSERVICE_URLS = {
 
 // Common headers preparation
 const prepareCommonHeaders = (headers: Headers) => {
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem('accessToken')
+  console.log("🚀 ~ prepareCommonHeaders ~ token:", token)
   if (token) {
     headers.set('authorization', `Bearer ${token}`)
   }

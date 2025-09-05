@@ -5,6 +5,7 @@ import { toggleCart } from '../store/cartSlice'
 import { logout as authLogout } from '../store/authSlice'
 import { clearCart } from '../store/cartSlice'
 import { useLogoutMutation } from '../store/apis'
+import { useAlert } from '../contexts/AlertContext'
 
 interface NavbarProps {
   className?: string
@@ -18,24 +19,25 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
   const [logoutMutation] = useLogoutMutation()
   const [showUserMenu, setShowUserMenu] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
-
+  const { showConfirm } = useAlert()
   const handleCartToggle = () => {
     dispatch(toggleCart())
   }
 
   const handleLogout = async () => {
-    if (window.confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-      try {
-        await logoutMutation().unwrap()
-      } catch (error) {
-        console.error('Logout error:', error)
-      } finally {
-        dispatch(authLogout())
-        dispatch(clearCart())
-        setShowUserMenu(false)
-        navigate('/', { replace: true })
-      }
-    }
+
+          showConfirm(
+            '¿Estás seguro de que quieres cerrar sesión?',
+            async () => {
+              await logoutMutation().unwrap()
+                    dispatch(authLogout())
+                    dispatch(clearCart())
+                    setShowUserMenu(false)
+                    navigate('/', { replace: true })
+
+                        },
+                        'Cerrar Sesión'
+          )
   }
 
   const toggleUserMenu = () => {
@@ -112,7 +114,7 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
                       className="dropdown-item"
                       onClick={handleProfileClick}
                     >
-                      <span className="dropdown-icon">⚙️</span>
+                      {/* <span className="dropdown-icon">⚙️</span> */}
                       Mi Perfil
                     </button>
                     <hr className="dropdown-divider" />
@@ -120,7 +122,7 @@ const Navbar: React.FC<NavbarProps> = ({ className = '' }) => {
                       className="dropdown-item logout-item"
                       onClick={handleLogout}
                     >
-                      <span className="dropdown-icon">🚪</span>
+                      {/* <span className="dropdown-icon">🚪</span> */}
                       Cerrar Sesión
                     </button>
                   </div>
