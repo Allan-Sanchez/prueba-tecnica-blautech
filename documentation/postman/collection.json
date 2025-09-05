@@ -1,8 +1,8 @@
 {
   "info": {
-    "name": "Prueba Técnica API - Shop App",
-    "description": "API REST para aplicación de tienda con autenticación JWT, gestión de usuarios, productos y carrito de compras.",
-    "version": "1.0.0",
+    "name": "Prueba Técnica API - Microservices Shop App",
+    "description": "Colección de endpoints para arquitectura de microservicios con Spring Boot, Spring Cloud Gateway, y autenticación JWT. Incluye servicios de autenticación, usuarios, productos, carritos y órdenes. Todos los endpoints utilizan el API Gateway en el puerto 8080.",
+    "version": "2.0.0",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -19,22 +19,38 @@
     {
       "key": "base_url",
       "value": "http://localhost:8080/api",
-      "type": "string"
+      "type": "string",
+      "description": "API Gateway URL - punto de entrada único para todos los microservicios"
     },
     {
       "key": "access_token",
       "value": "",
-      "type": "string"
+      "type": "string",
+      "description": "JWT Token de acceso (se actualiza automáticamente en login y refresh)"
     },
     {
       "key": "refresh_token",
       "value": "",
-      "type": "string"
+      "type": "string",
+      "description": "JWT Refresh Token (se actualiza automáticamente en login y refresh)"
     },
     {
       "key": "user_id",
       "value": "",
-      "type": "string"
+      "type": "string",
+      "description": "ID del usuario autenticado"
+    },
+    {
+      "key": "session_id",
+      "value": "session123",
+      "type": "string",
+      "description": "ID de sesión para usuarios anónimos en el carrito"
+    },
+    {
+      "key": "order_number",
+      "value": "ORD-2024-001234",
+      "type": "string",
+      "description": "Número de orden de ejemplo"
     }
   ],
   "item": [
@@ -526,76 +542,7 @@
           "response": []
         },
         {
-          "name": "Create Product",
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Laptop Gaming MSI\",\n  \"description\": \"Laptop para gaming con procesador Intel i7, 16GB RAM, SSD 512GB y tarjeta gráfica RTX 3060\",\n  \"imageUrl\": \"https://example.com/images/laptop-msi.jpg\",\n  \"price\": 1299.99,\n  \"currency\": \"GTQ\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/products",
-              "host": ["{{base_url}}"],
-              "path": ["products"]
-            },
-            "description": "Crear un nuevo producto"
-          },
-          "response": []
-        },
-        {
-          "name": "Update Product",
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Laptop Gaming MSI - Actualizado\",\n  \"description\": \"Laptop para gaming actualizada con procesador Intel i7, 32GB RAM, SSD 1TB y tarjeta gráfica RTX 4060\",\n  \"price\": 1499.99\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/products/1",
-              "host": ["{{base_url}}"],
-              "path": ["products", "1"]
-            },
-            "description": "Actualizar un producto existente"
-          },
-          "response": []
-        },
-        {
-          "name": "Deactivate Product",
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/products/1",
-              "host": ["{{base_url}}"],
-              "path": ["products", "1"]
-            },
-            "description": "Desactivar un producto (soft delete)"
-          },
-          "response": []
-        },
-        {
-          "name": "Get Products Count",
+          "name": "Get Product Health",
           "request": {
             "auth": {
               "type": "noauth"
@@ -603,11 +550,11 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/products/count",
+              "raw": "{{base_url}}/products/health",
               "host": ["{{base_url}}"],
-              "path": ["products", "count"]
+              "path": ["products", "health"]
             },
-            "description": "Obtener el total de productos activos"
+            "description": "Verificar el estado de salud del Product Service"
           },
           "response": []
         }
@@ -657,25 +604,38 @@
     },
     {
       "name": "Carts",
-      "description": "Gestión del carrito de compras (endpoints futuros)",
+      "description": "Gestión del carrito de compras - soporta usuarios anónimos y autenticados",
       "item": [
         {
-          "name": "Get User Cart",
+          "name": "Get Cart",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/carts/me",
+              "raw": "{{base_url}}/carts?sessionId=session123",
               "host": ["{{base_url}}"],
-              "path": ["carts", "me"]
+              "path": ["carts"],
+              "query": [
+                {
+                  "key": "sessionId",
+                  "value": "session123",
+                  "description": "ID de sesión para usuarios anónimos"
+                }
+              ]
             },
-            "description": "Obtener el carrito activo del usuario autenticado"
+            "description": "Obtener el carrito actual (funciona para usuarios anónimos con sessionId o autenticados)"
           },
           "response": []
         },
         {
           "name": "Add Item to Cart",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [
               {
@@ -685,35 +645,40 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"productId\": 1,\n  \"quantity\": 2\n}"
+              "raw": "{\n  \"productId\": 1,\n  \"quantity\": 2,\n  \"sessionId\": \"session123\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/carts/items",
               "host": ["{{base_url}}"],
               "path": ["carts", "items"]
             },
-            "description": "Agregar un producto al carrito"
+            "description": "Agregar un producto al carrito (incluir sessionId para usuarios anónimos)"
           },
           "response": []
         },
         {
           "name": "Update Cart Item",
           "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"quantity\": 3\n}"
+            "auth": {
+              "type": "noauth"
             },
+            "method": "PUT",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/carts/items/1",
+              "raw": "{{base_url}}/carts/items/1?quantity=3&sessionId=session123",
               "host": ["{{base_url}}"],
-              "path": ["carts", "items", "1"]
+              "path": ["carts", "items", "1"],
+              "query": [
+                {
+                  "key": "quantity",
+                  "value": "3"
+                },
+                {
+                  "key": "sessionId",
+                  "value": "session123",
+                  "description": "ID de sesión para usuarios anónimos"
+                }
+              ]
             },
             "description": "Actualizar la cantidad de un item en el carrito"
           },
@@ -722,14 +687,86 @@
         {
           "name": "Remove Item from Cart",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/carts/items/1",
+              "raw": "{{base_url}}/carts/items/1?sessionId=session123",
               "host": ["{{base_url}}"],
-              "path": ["carts", "items", "1"]
+              "path": ["carts", "items", "1"],
+              "query": [
+                {
+                  "key": "sessionId",
+                  "value": "session123",
+                  "description": "ID de sesión para usuarios anónimos"
+                }
+              ]
             },
             "description": "Eliminar un item del carrito"
+          },
+          "response": []
+        },
+        {
+          "name": "Clear Cart",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/carts?sessionId=session123",
+              "host": ["{{base_url}}"],
+              "path": ["carts"],
+              "query": [
+                {
+                  "key": "sessionId",
+                  "value": "session123",
+                  "description": "ID de sesión para usuarios anónimos"
+                }
+              ]
+            },
+            "description": "Vaciar completamente el carrito"
+          },
+          "response": []
+        },
+        {
+          "name": "Proceed to Checkout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/carts/checkout?sessionId=session123",
+              "host": ["{{base_url}}"],
+              "path": ["carts", "checkout"],
+              "query": [
+                {
+                  "key": "sessionId",
+                  "value": "session123",
+                  "description": "ID de sesión para usuarios anónimos"
+                }
+              ]
+            },
+            "description": "Proceder al checkout (requiere autenticación JWT)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cart Health",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/carts/health",
+              "host": ["{{base_url}}"],
+              "path": ["carts", "health"]
+            },
+            "description": "Verificar el estado de salud del Cart Service"
           },
           "response": []
         }
@@ -737,10 +774,10 @@
     },
     {
       "name": "Orders",
-      "description": "Gestión de órdenes y checkout (endpoints futuros)",
+      "description": "Gestión de órdenes - crear, consultar, actualizar estado, cancelar",
       "item": [
         {
-          "name": "Checkout",
+          "name": "Create Order",
           "request": {
             "method": "POST",
             "header": [
@@ -751,14 +788,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"paymentMethod\": \"credit_card\",\n  \"shippingAddress\": \"123 Calle Principal, Ciudad, País\"\n}"
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": 1,\n      \"quantity\": 2,\n      \"price\": 1299.99\n    },\n    {\n      \"productId\": 2,\n      \"quantity\": 1,\n      \"price\": 899.50\n    }\n  ],\n  \"shippingAddress\": \"123 Calle Principal, Ciudad, País\",\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"notes\": \"Entregar en horas de oficina\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/orders/checkout",
+              "raw": "{{base_url}}/orders",
               "host": ["{{base_url}}"],
-              "path": ["orders", "checkout"]
+              "path": ["orders"]
             },
-            "description": "Realizar checkout del carrito y crear una orden"
+            "description": "Crear una nueva orden (requiere autenticación JWT)"
           },
           "response": []
         },
@@ -768,25 +805,133 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/orders/me",
+              "raw": "{{base_url}}/orders?page=0&size=10",
               "host": ["{{base_url}}"],
-              "path": ["orders", "me"]
+              "path": ["orders"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Número de página (opcional)"
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "description": "Tamaño de página (opcional)"
+                }
+              ]
             },
-            "description": "Obtener todas las órdenes del usuario autenticado"
+            "description": "Obtener todas las órdenes del usuario autenticado con paginación"
           },
           "response": []
         },
         {
-          "name": "Get Order by ID",
+          "name": "Get Orders by Status",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/orders/1",
+              "raw": "{{base_url}}/orders?status=PENDING",
               "host": ["{{base_url}}"],
-              "path": ["orders", "1"]
+              "path": ["orders"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "PENDING",
+                  "description": "Estados válidos: PENDING, CONFIRMED, PROCESSING, SHIPPED, DELIVERED, CANCELLED"
+                }
+              ]
             },
-            "description": "Obtener una orden específica por ID"
+            "description": "Filtrar órdenes por estado"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orders?search=ORD-2024",
+              "host": ["{{base_url}}"],
+              "path": ["orders"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "ORD-2024",
+                  "description": "Buscar por número de orden, productos, etc."
+                }
+              ]
+            },
+            "description": "Buscar órdenes por términos específicos"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Order by Number",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orders/ORD-2024-001234",
+              "host": ["{{base_url}}"],
+              "path": ["orders", "ORD-2024-001234"]
+            },
+            "description": "Obtener una orden específica por número de orden"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Order Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"CONFIRMED\",\n  \"notes\": \"Orden confirmada y lista para procesar\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/orders/ORD-2024-001234/status",
+              "host": ["{{base_url}}"],
+              "path": ["orders", "ORD-2024-001234", "status"]
+            },
+            "description": "Actualizar el estado de una orden (estados válidos: PENDING, CONFIRMED, PROCESSING, SHIPPED, DELIVERED, CANCELLED)"
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Order",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orders/ORD-2024-001234",
+              "host": ["{{base_url}}"],
+              "path": ["orders", "ORD-2024-001234"]
+            },
+            "description": "Cancelar una orden (solo órdenes en estado PENDING o CONFIRMED)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Order Health",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orders/health",
+              "host": ["{{base_url}}"],
+              "path": ["orders", "health"]
+            },
+            "description": "Verificar el estado de salud del Order Service"
           },
           "response": []
         }

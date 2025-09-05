@@ -1,5 +1,17 @@
 // Importar estilos organizados
 @import './variables';
 @import './base';
-@import './components';
+
+// Components (modular)
+@import './buttons';
+@import './forms';
+@import './cards';
+@import './navigation';
+@import './layout';
+@import './alerts';
+
+// Pages
+@import './pages';
+
+// Utilities
 @import './utilities';

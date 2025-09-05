@@ -1,6 +1,5 @@
-package com.pruebatecnica.orderservice.config;
+package com.pruebatecnica.productservice.config;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -8,7 +7,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -18,10 +16,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
-    
-    private final JwtAuthenticationFilter jwtAuthFilter;
     
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -30,18 +25,11 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers("/api/orders/health").permitAll()          // Health check
-                        .requestMatchers("/error").permitAll()                     // Error handling
-                        .requestMatchers("/actuator/**").permitAll()               // Actuator endpoints
-                        
-                        // All order endpoints require authentication
-                        .requestMatchers("/api/orders/**").authenticated()         // All order operations require JWT
-                        
-                        // All other requests require authentication
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                        .requestMatchers("/api/products/**").permitAll()
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
+                        .anyRequest().permitAll()
+                );
         
         return http.build();
     }

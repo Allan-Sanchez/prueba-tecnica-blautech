@@ -120,7 +120,9 @@
       "Bash(start-microservices.bat)",
       "Bash(pkill:*)",
       "Bash(mvn:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(npm install:*)",
+      "Bash(del \"C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\frontend-store\\src\\scss\\components.scss\")"
     ],
     "deny": [],
     "ask": []

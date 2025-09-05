@@ -33,3 +33,104 @@ export interface Configuration {
   createdAt: string
   updatedAt: string
 }
+
+export interface Product {
+  id: number
+  name: string
+  description: string
+  priceInCurrency: number
+  // stock: number
+  imageUrl?: string
+  category?: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface User {
+  id: number
+  email: string
+  firstName: string
+  lastName: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface AuthResponse {
+  accessToken: string
+  refreshToken: string
+  user: User
+}
+
+export interface LoginRequest {
+  email: string
+  password: string
+}
+
+export interface RegisterRequest {
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+}
+
+export interface CartItem {
+  id: string
+  productId: number
+  quantity: number
+  product: Product
+}
+
+export interface Cart {
+  items: CartItem[]
+  totalItems: number
+  totalPrice: number
+}
+
+export interface CartItemRequest {
+  productId: number
+  quantity: number
+}
+
+export interface Order {
+  id: number
+  userId: number
+  items: OrderItem[]
+  totalAmount: number
+  status: OrderStatus
+  shippingAddress: Address
+  paymentMethod: PaymentMethod
+  createdAt: string
+  updatedAt: string
+}
+
+export interface OrderItem {
+  id: number
+  productId: number
+  quantity: number
+  unitPrice: number
+  totalPrice: number
+  product: Product
+}
+
+export interface Address {
+  street: string
+  city: string
+  state: string
+  zipCode: string
+  country: string
+}
+
+export interface PaymentMethod {
+  type: 'CREDIT_CARD' | 'DEBIT_CARD' | 'PAYPAL' | 'BANK_TRANSFER'
+  details?: string
+}
+
+export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED'
+
+export interface CreateOrderRequest {
+  items: CartItemRequest[]
+  shippingAddress: Address
+  paymentMethod: PaymentMethod
+}
