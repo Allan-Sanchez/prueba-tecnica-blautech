@@ -49,7 +49,7 @@ const Login: React.FC = () => {
         dispatch(loginSuccess(response.data))
         showAlert({
           type: 'success',
-          message: `¡Bienvenido, ${response.data.firstName}!`
+          message: `¡Bienvenido, ${response.data.user.firstName}!`
         })
         navigate(from, { replace: true })
       } else {

@@ -73,8 +73,14 @@ input, textarea, select {
   margin-bottom: 1rem;
   font-size: 0.875rem;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
+  line-height: 1.4;
+
+  @media (max-width: 480px) {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.8125rem;
+  }
 
   [data-theme="dark"] & {
     background: rgba(239, 68, 68, 0.1);
@@ -92,8 +98,14 @@ input, textarea, select {
   margin-bottom: 1rem;
   font-size: 0.875rem;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
+  line-height: 1.4;
+
+  @media (max-width: 480px) {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.8125rem;
+  }
 
   [data-theme="dark"] & {
     background: rgba(16, 185, 129, 0.1);

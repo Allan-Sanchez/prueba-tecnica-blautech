@@ -9,6 +9,7 @@ import {
 } from '../store/apis'
 import { ProductCard } from '../components'
 import type { Product } from '../types'
+import '../scss/pages/_home.scss'
 
 const Home: React.FC = () => {
   const dispatch = useAppDispatch()
@@ -43,8 +44,8 @@ const Home: React.FC = () => {
     setFormData({
       name: '',
       description: '',
-      price: 0,
-      stock: 0,
+      priceInCurrency: 0,
+      // stock: 0,
       category: '',
       imageUrl: '',
       isActive: true

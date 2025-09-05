@@ -63,7 +63,7 @@ const Register: React.FC = () => {
         showAlert({
           type: 'success',
           title: '¡Cuenta creada exitosamente!',
-          message: `Bienvenido, ${response.data.firstName}!`
+          message: `Bienvenido, ${response.data.user.firstName}!`
         })
         navigate('/', { replace: true })
       } else {
@@ -238,17 +238,7 @@ const Register: React.FC = () => {
           </div>
         </div>
 
-        {/* Registration Info */}
-        <div className="registration-info">
-          <h4>Beneficios de crear una cuenta</h4>
-          <ul>
-            <li>Guarda productos en tu carrito</li>
-            <li>Historial de órdenes</li>
-            <li>Checkout más rápido</li>
-            <li>Ofertas personalizadas</li>
-            <li>Sincronización entre dispositivos</li>
-          </ul>
-        </div>
+       
       </div>
     </div>
   )
