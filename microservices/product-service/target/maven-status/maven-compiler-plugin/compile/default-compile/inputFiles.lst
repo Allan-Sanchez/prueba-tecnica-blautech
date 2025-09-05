@@ -2,3 +2,5 @@ C:\Users\asanchez\Documents\proyectos\Personales\Prueba-tecnica\microservices\pr
 C:\Users\asanchez\Documents\proyectos\Personales\Prueba-tecnica\microservices\product-service\src\main\java\com\pruebatecnica\productservice\dto\ApiResponse.java
 C:\Users\asanchez\Documents\proyectos\Personales\Prueba-tecnica\microservices\product-service\src\main\java\com\pruebatecnica\productservice\entity\Product.java
 C:\Users\asanchez\Documents\proyectos\Personales\Prueba-tecnica\microservices\product-service\src\main\java\com\pruebatecnica\productservice\ProductServiceApplication.java
+C:\Users\asanchez\Documents\proyectos\Personales\Prueba-tecnica\microservices\product-service\src\main\java\com\pruebatecnica\productservice\repository\ProductRepository.java
+C:\Users\asanchez\Documents\proyectos\Personales\Prueba-tecnica\microservices\product-service\src\main\java\com\pruebatecnica\productservice\service\ProductService.java
