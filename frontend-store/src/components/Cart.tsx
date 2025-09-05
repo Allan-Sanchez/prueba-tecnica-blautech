@@ -1,15 +1,19 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAppSelector, useAppDispatch } from '../store/hooks'
 import { removeFromCart, updateQuantity, clearCart, setCartOpen } from '../store/cartSlice'
 import { useAlert } from '../contexts/AlertContext'
+import { useCreateOrderMutation } from '../store/apis/orderApi'
 
 const Cart: React.FC = () => {
+  const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const { items, totalItems, totalPrice, isOpen } = useAppSelector(state => state.cart)
-  const { showConfirm } = useAlert()
+  const { isAuthenticated, user } = useAppSelector(state => state.auth)
+  const { showConfirm, showAlert } = useAlert()
+  const [createOrder, { isLoading: isCreatingOrder }] = useCreateOrderMutation()
 
   const formatPrice = (price: number) => {
-    console.log("🚀 ~ formatPrice ~ number:", price)
     return new Intl.NumberFormat('es-GT', {
       style: 'currency',
       currency: 'GTQ'
@@ -35,9 +39,75 @@ const Cart: React.FC = () => {
     )
   }
 
-  const handleCheckout = () => {
-    alert('Funcionalidad de checkout en desarrollo')
-    // TODO: Implement checkout functionality
+  const handleCheckout = async () => {
+    // Validar que hay items en el carrito
+    if (items.length === 0) {
+      showAlert({
+        type: 'warning',
+        title: 'Carrito vacío',
+        message: 'No hay productos en tu carrito para procesar.',
+      })
+      return
+    }
+
+    // Verificar autenticación
+    if (!isAuthenticated) {
+      showConfirm(
+        'Para procesar tu compra necesitas iniciar sesión. ¿Deseas ir al login? Tu carrito se mantendrá guardado.',
+        () => {
+          dispatch(setCartOpen(false))
+          navigate('/login')
+        },
+        'Iniciar Sesión Requerida'
+      )
+      return
+    }
+
+    try {
+      // Por ahora crear una orden básica - en el futuro se pueden agregar datos de dirección y pago
+      const orderRequest = {
+        items: items.map(item => ({
+          productId: item.product.id,
+          quantity: item.quantity,
+          pricePerUnit: item.product.priceInCurrency
+        })),
+        // Dirección y método de pago por defecto - se pueden obtener del perfil del usuario o un formulario
+        shippingAddress: {
+          street: 'Dirección por defecto',
+          city: 'Ciudad',
+          state: 'Estado',
+          zipCode: '01001',
+          country: 'Guatemala'
+        },
+        paymentMethod: {
+          type: 'CASH_ON_DELIVERY',
+          details: 'Pago contra entrega'
+        }
+      }
+
+      const response = await createOrder(orderRequest).unwrap()
+      
+      if (response.success) {
+        showAlert({
+          type: 'success',
+          title: '¡Orden creada exitosamente!',
+          message: `Tu orden #${response.data.id} ha sido procesada. Total: ${formatPrice(response.data.totalAmount)}`,
+          duration: 8000
+        })
+        
+        // Limpiar el carrito después de crear la orden exitosamente
+        dispatch(clearCart())
+        dispatch(setCartOpen(false))
+      }
+    } catch (error: any) {
+      console.error('Error creating order:', error)
+      showAlert({
+        type: 'error',
+        title: 'Error al procesar la orden',
+        message: error?.data?.message || 'Hubo un problema al procesar tu orden. Inténtalo nuevamente.',
+        duration: 8000
+      })
+    }
   }
 
   const closeCart = () => {
@@ -127,8 +197,9 @@ const Cart: React.FC = () => {
                   <button 
                     className="btn-primary"
                     onClick={handleCheckout}
+                    disabled={isCreatingOrder}
                   >
-                    Pagar
+                    {isCreatingOrder ? 'Procesando...' : 'Pagar'}
                   </button>
                 </div>
               </div>
