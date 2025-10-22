@@ -1,0 +1,428 @@
+name: CI/CD Pipeline - Microservices
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+
+env:
+  JAVA_VERSION: '21'
+  NODE_VERSION: '20'
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+
+jobs:
+  # ==================== ANÁLISIS Y PRUEBAS ====================
+
+  test-backend:
+    name: Backend Tests & Security Scan
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_db
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Run unit tests
+        run: |
+          cd microservices
+          mvn clean test -B
+
+      - name: Run integration tests
+        run: |
+          cd microservices
+          mvn verify -B -DskipUnitTests=true
+
+      - name: Generate test coverage report
+        run: |
+          cd microservices
+          mvn jacoco:report
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./microservices/**/target/site/jacoco/jacoco.xml
+          flags: backend
+
+      - name: OWASP Dependency Check
+        run: |
+          cd microservices
+          mvn org.owasp:dependency-check-maven:check -B
+
+      - name: Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: './microservices'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: SonarCloud Scan
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          cd microservices
+          mvn sonar:sonar \
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        continue-on-error: true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-backend
+          path: |
+            microservices/**/target/surefire-reports/
+            microservices/**/target/failsafe-reports/
+            microservices/**/target/site/jacoco/
+
+  test-frontend:
+    name: Frontend Tests & Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend-store/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend-store
+          npm ci
+
+      - name: Run linter
+        run: |
+          cd frontend-store
+          npm run lint || true
+
+      - name: Run tests
+        run: |
+          cd frontend-store
+          npm test -- --coverage --watchAll=false || true
+
+      - name: NPM Audit
+        run: |
+          cd frontend-store
+          npm audit --audit-level=moderate || true
+
+      - name: Trivy vulnerability scanner - Frontend
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: './frontend-store'
+          format: 'sarif'
+          output: 'trivy-frontend-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-frontend-results.sarif'
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-frontend
+          path: |
+            frontend-store/coverage/
+
+  # ==================== BUILD & DOCKER ====================
+
+  build-and-push:
+    name: Build & Push Docker Images
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+
+    strategy:
+      matrix:
+        service:
+          - name: discovery-server
+            path: microservices/discovery-server
+            port: 8761
+          - name: api-gateway
+            path: microservices/api-gateway
+            port: 8080
+          - name: auth-service
+            path: microservices/auth-service
+            port: 8081
+          - name: product-service
+            path: microservices/product-service
+            port: 8082
+          - name: cart-service
+            path: microservices/cart-service
+            port: 8083
+          - name: order-service
+            path: microservices/order-service
+            port: 8084
+          - name: frontend-store
+            path: frontend-store
+            port: 3000
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/${{ matrix.service.name }}:$IMAGE_TAG \
+                       -t $ECR_REGISTRY/${{ matrix.service.name }}:latest \
+                       -f ${{ matrix.service.path }}/Dockerfile \
+                       ${{ matrix.service.path }}
+          docker push $ECR_REGISTRY/${{ matrix.service.name }}:$IMAGE_TAG
+          docker push $ECR_REGISTRY/${{ matrix.service.name }}:latest
+
+      - name: Scan Docker image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ steps.login-ecr.outputs.registry }}/${{ matrix.service.name }}:${{ github.sha }}
+          format: 'sarif'
+          output: 'trivy-image-results.sarif'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-image-results.sarif'
+
+  # ==================== DESPLIEGUE EN STAGING ====================
+
+  deploy-staging:
+    name: Deploy to Staging (AWS ECS)
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/develop'
+    environment:
+      name: staging
+      url: https://staging.mitienda.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy Discovery Server to ECS
+        run: |
+          aws ecs update-service \
+            --cluster prueba-tecnica-staging \
+            --service discovery-server \
+            --force-new-deployment \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Wait for Discovery Server
+        run: |
+          aws ecs wait services-stable \
+            --cluster prueba-tecnica-staging \
+            --services discovery-server \
+            --region ${{ env.AWS_REGION }}
+          sleep 30
+
+      - name: Deploy Auth Service to ECS
+        run: |
+          aws ecs update-service \
+            --cluster prueba-tecnica-staging \
+            --service auth-service \
+            --force-new-deployment \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Deploy Product Service to ECS
+        run: |
+          aws ecs update-service \
+            --cluster prueba-tecnica-staging \
+            --service product-service \
+            --force-new-deployment \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Wait for Services
+        run: |
+          aws ecs wait services-stable \
+            --cluster prueba-tecnica-staging \
+            --services auth-service product-service \
+            --region ${{ env.AWS_REGION }}
+          sleep 20
+
+      - name: Deploy API Gateway to ECS
+        run: |
+          aws ecs update-service \
+            --cluster prueba-tecnica-staging \
+            --service api-gateway \
+            --force-new-deployment \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Deploy Frontend to S3 & CloudFront
+        run: |
+          aws s3 sync frontend-store/dist/ s3://prueba-tecnica-frontend-staging --delete
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_STAGING }} \
+            --paths "/*"
+
+      - name: Run smoke tests
+        run: |
+          chmod +x ./scripts/smoke-tests.sh
+          ./scripts/smoke-tests.sh https://staging-api.mitienda.com
+
+  # ==================== DESPLIEGUE EN PRODUCCIÓN ====================
+
+  deploy-production:
+    name: Deploy to Production (AWS ECS)
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://mitienda.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy Discovery Server to ECS
+        run: |
+          aws ecs update-service \
+            --cluster prueba-tecnica-production \
+            --service discovery-server \
+            --force-new-deployment \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Wait for Discovery Server
+        run: |
+          aws ecs wait services-stable \
+            --cluster prueba-tecnica-production \
+            --service discovery-server \
+            --region ${{ env.AWS_REGION }}
+          sleep 30
+
+      - name: Deploy Auth Service to ECS
+        run: |
+          aws ecs update-service \
+            --cluster prueba-tecnica-production \
+            --service auth-service \
+            --force-new-deployment \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Deploy Product Service to ECS
+        run: |
+          aws ecs update-service \
+            --cluster prueba-tecnica-production \
+            --service product-service \
+            --force-new-deployment \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Wait for Services
+        run: |
+          aws ecs wait services-stable \
+            --cluster prueba-tecnica-production \
+            --services auth-service product-service \
+            --region ${{ env.AWS_REGION }}
+          sleep 20
+
+      - name: Deploy API Gateway to ECS
+        run: |
+          aws ecs update-service \
+            --cluster prueba-tecnica-production \
+            --service api-gateway \
+            --force-new-deployment \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Deploy Frontend to S3 & CloudFront
+        run: |
+          aws s3 sync frontend-store/dist/ s3://prueba-tecnica-frontend-production --delete
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID_PRODUCTION }} \
+            --paths "/*"
+
+      - name: Run smoke tests
+        run: |
+          chmod +x ./scripts/smoke-tests.sh
+          ./scripts/smoke-tests.sh https://api.mitienda.com
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Release v${{ github.run_number }}
+          body: |
+            Deployed to production
+            Commit: ${{ github.sha }}
+          draft: false
+          prerelease: false

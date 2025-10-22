@@ -1,0 +1,43 @@
+# General
+.git
+.gitignore
+*.md
+LICENSE
+
+# IDEs
+.idea
+.vscode
+*.iml
+*.iws
+*.ipr
+
+# Build outputs
+target/
+dist/
+build/
+node_modules/
+.next/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+*.test.js
+*.spec.js
+
+# Documentation
+documentation/
+
+# CI/CD
+.github/

@@ -160,11 +160,59 @@ Prueba-tecnica/
 
 Ejecutar scripts SQL en documentation/DB/ para crear las estructuras necesarias en cada base de datos de microservicio.
 
+## CI/CD y Despliegue
+
+### Pipeline Automatizado
+
+El proyecto incluye un pipeline completo de CI/CD con GitHub Actions:
+
+**Etapas del Pipeline:**
+1. **Tests Automatizados** - Tests unitarios, integración y coverage
+2. **Escaneo de Vulnerabilidades** - OWASP, Trivy, SonarCloud, NPM Audit
+3. **Construcción** - Docker multi-stage builds y push a Amazon ECR
+4. **Despliegue** - Automático a AWS ECS (Fargate)
+
+**Documentación:** Ver `documentation/CI-CD/` para guías completas:
+- `GUIA-CICD.md` - Guía completa del pipeline
+- `SECRETOS-GITHUB.md` - Configuración de secretos
+- `AWS-SETUP.md` - Setup de infraestructura
+
+**Branches y Ambientes:**
+- `feature/*` - Solo ejecuta tests y scans
+- `develop` - Deploy automático a Staging
+- `main` - Deploy manual a Production (requiere aprobación)
+
+### Infraestructura AWS
+
+**Servicios Utilizados:**
+- **ECS Fargate** - Contenedores serverless
+- **RDS MySQL** - Bases de datos (una por microservicio)
+- **Application Load Balancer** - Balanceo de carga
+- **ECR** - Registro de imágenes Docker
+- **S3 + CloudFront** - Hosting y CDN para frontend
+- **CloudWatch** - Logs y métricas
+
+**Despliegue:** Infraestructura como código con Terraform
+
+### Docker
+
+Cada microservicio tiene su Dockerfile con:
+- Multi-stage builds (builder + runtime)
+- Imágenes optimizadas basadas en Alpine
+- Usuario no-root por seguridad
+- Health checks configurados
+
+**Archivos:**
+- `microservices/*/Dockerfile` - Backend services
+- `frontend-store/Dockerfile` - Frontend con Nginx
+
 ## Estado del Desarrollo
 
 - ✅ Discovery Server
-- ✅ API Gateway  
+- ✅ API Gateway
 - ✅ Auth Service
 - 🔄 Product Service (En progreso)
 - ⏳ Cart Service (Pendiente)
 - ⏳ Order Service (Pendiente)
+- ✅ CI/CD Pipeline
+- ✅ Infraestructura AWS (Terraform)

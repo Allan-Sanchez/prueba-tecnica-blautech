@@ -123,7 +123,14 @@
       "Bash(dir:*)",
       "Bash(npm install:*)",
       "Bash(del \"C:\\Users\\asanchez\\Documents\\proyectos\\Personales\\Prueba-tecnica\\frontend-store\\src\\scss\\components.scss\")",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(mkdir:*)",
+      "Bash(test:*)",
+      "Bash(pip install:*)",
+      "Bash(python -m pip:*)",
+      "Bash(python3 -m pip:*)",
+      "Bash(python scripts/generate-html-doc.py:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []
